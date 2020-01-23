@@ -1,18 +1,27 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
-interface AppRouteBinder {
+export interface AppRouteBinder {
     path : string
     component : React.FC
 }
 
-const Routes : React.FC<[AppRouteBinder]> = (props) => {
+
+const Routes : React.FC<[AppRouteBinder]> = (appRoutes : [AppRouteBinder]) => {
+    // appRoutes.map( routeBinder => {
+    //     console.log("Routes props "+routeBinder.path)
+    // })
+    
+
     return (
-        //todo: return bounded app routes
         <Router>
-            {props.map( routeBinder => {
-                <Route path={routeBinder.path} component={routeBinder.component}/>
-            })}
+            { 
+              appRoutes.map( routeBinder => { 
+                return (
+                    <Route exact path={routeBinder.path} component={routeBinder.component}/>
+                    )
+                })
+            }
         </Router>
     )
 }
