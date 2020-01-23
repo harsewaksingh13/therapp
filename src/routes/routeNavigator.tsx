@@ -1,3 +1,4 @@
+import { createBrowserHistory } from 'history';
 
 interface RouteNavigator {
     login(): void

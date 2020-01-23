@@ -8,7 +8,7 @@ interface AppRouteBinder {
 
 const Routes : React.FC<[AppRouteBinder]> = (props) => {
     return (
-        //todo: return binded app routes
+        //todo: return bounded app routes
         <Router>
             {props.map( routeBinder => {
                 <Route path={routeBinder.path} component={routeBinder.component}/>

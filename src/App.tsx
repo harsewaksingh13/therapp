@@ -1,16 +1,19 @@
 import React, { useEffect } from "react";
-import userInteractor from './interactors/userInteractor'
+import userManager from './managers/userManager'
+import {BrowserRouter} from "react-router-dom";
 
 const App: React.FC = () => {
 
   useEffect(() => {
-    userInteractor.welcome()    
+    userManager.welcome()
   });
 
   return (
+      <BrowserRouter>
     <div>
       Welcome
     </div>
+      </BrowserRouter>
   );
 }
 

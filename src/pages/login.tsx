@@ -1,8 +1,10 @@
 import React from 'react';
-import userInteractor from '../interactors/userInteractor'
+import userManager from '../managers/userManager'
 
 function handleLogin() {
-   userInteractor.login({email:"test@gmail.com",password:"123456"}) 
+   userManager.login({email:"test@gmail.com",password:"123456"}) .then(res => {
+
+   })
 }
 
 const Login: React.FC = () => {
