@@ -3,6 +3,8 @@ interface DataManager {
 
     hasSession(): boolean
 
+    clearSession() : void
+
     saveObj<T extends Object>(obj: T): void
 
     save<T>(key: string, obj: T): void
@@ -21,6 +23,10 @@ class DataManagerHandler implements DataManager {
     hasSession(): boolean {
         let token = localStorage.getItem("Token")
         return token != null && token.length > 0
+    }
+
+    clearSession() : void {
+        localStorage.clear()
     }
 
     saveObj<T extends Object>(obj: T): void {

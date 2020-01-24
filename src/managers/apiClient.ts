@@ -1,30 +1,27 @@
 import * as rm from 'typed-rest-client'
 import {HttpClient} from "typed-rest-client/HttpClient";
-import {ApiError} from "../models/apiError";
+import {ApiError, AppError} from "../models/apiError";
 
 
 export interface Response<T,E extends Error> {
-
-    data() : T;
-
-    error() : E;
+    data : T
+    error? : E;
 }
 
-export interface ApiResponse<T> {
-    error? : Error
+export interface ApiResponse<T> extends Response <T, ApiError> {
+    error? : ApiError
     data : T
 }
 
 export interface ApiRequest {
     cancel() : void
-    apiResponseHandler<T>() : Promise<ApiResponse<T>>
-    responseHandler<T>() : Promise<T>
     response<T>() : Promise<Response<T,Error>>
 }
 
 export interface ApiClient {
     post(url: string,  parameters:any | null, headers?: Map<string,any> | null) : ApiRequest
     get(url: string,  parameters?:any | null, headers?: Map<string,any> | null) : ApiRequest
+    delete(url: string,  parameters?:any | null, headers?: Map<string,any> | null) : ApiRequest
 }
 
 class RestApiClient implements ApiClient {
@@ -37,6 +34,10 @@ class RestApiClient implements ApiClient {
 
     post(url: string,  parameters:any | null, headers?: Map<string,any> | null): ApiRequest {
         return this.request(url,'post',headers,parameters)
+    }
+
+    delete(url: string,  parameters:any | null, headers?: Map<string,any> | null): ApiRequest {
+        return this.request(url,'delete',headers,parameters)
     }
 
     private request(url: string, method: string, headers?: Map<string, string> | null, parameters?: Map<string, string> | null) : ApiRequest {
@@ -59,59 +60,64 @@ class ApiRequestHandler implements ApiRequest {
         this.httpClient = rest.client
         this.headers = headers
         this.parameters = parameters
+
+    
+        if(headers === undefined || headers === null){
+            this.headers =  {
+                "Content-Type": "application/json",
+            }
+        }
     }
+    
     cancel(): void {
         this.httpClient.dispose()
     }
 
-    async apiResponseHandler<T>(): Promise<ApiResponse<T>> {
-        if(this.method === "post") {
-            let response = await this.rest.create<ApiResponse<T>>(this.url,this.parameters)
-            return  new Promise<ApiResponse<T>>( (resolver, reject) => {
-                if (response.result == null) {
-                    let error : ApiError = {name:"",message:"Null response returned"}
-                    reject(error)
-                } else {
-                    resolver(response.result)
-                }
-            })
-        } else {
-            let response = await this.rest.get<ApiResponse<T>>(this.url)
-            return  new Promise<ApiResponse<T>>( (resolver, reject) => {
-                if (response.result == null) {
-                    let error : ApiError = {name:"",message:"Null response returned"}
-                    reject(error)
-                } else {
-                    resolver(response.result)
-                }
-            })
-        }
 
+    requestOptions() : rm.IRequestOptions {
+        return {additionalHeaders:this.headers}
     }
 
-   async responseHandler<T>(): Promise<T> {
-        let response = await this.rest.get<T>(this.url)
-       return  new Promise<T>( (resolver, reject) => {
-           if (response.result == null) {
-               let error : ApiError = {name:"",message:"Null response returned"}
-               reject(error)
-           } else {
-               resolver(response.result)
-           }
-       })
-   }
+    async apiResponseHandler<T>(): Promise<ApiResponse<T>> {
+        if(this.method === "post") {
+            let options = this.requestOptions()
+            console.log("request options "+JSON.stringify(options))
+            console.log("request body "+JSON.stringify(this.parameters))
+            let response = await this.rest.create<ApiResponse<T>>(this.url,this.parameters,options)
+            return  this.validateApiResponse(response)
+        } else if(this.method === "delete"){
+            let response = await this.rest.del<ApiResponse<T>>(this.url)
+            return  this.validateApiResponse(response)
+        } else  {//if(this.method === "get")
+            let response = await this.rest.get<ApiResponse<T>>(this.url)
+            return  this.validateApiResponse(response)
+        }
+    }
+
+    private validateApiResponse<T>(response : rm.IRestResponse<ApiResponse<T>>) : Promise<ApiResponse<T>> {
+        return new Promise<ApiResponse<T>>( (resolver, reject) => {
+            console.log("response "+JSON.stringify(response))
+            //todo: handle statusCode : 200 or other
+            if (response.result == null) {
+                let error : AppError = {name:"",message:"Null response returned"}
+                reject(error)
+            } else {
+                if (response.result.error === undefined || response.result.error === null) {
+                    console.log("result data not null resolve with result")
+                    resolver(response.result)
+                } else {
+                    //api returned error
+                    console.log("result data is null reject with error"+JSON.stringify(response.result.error))
+                    reject(response.result.error)
+                }
+            }
+        })
+    }
 
    async response<T>(): Promise<Response<T, Error>> {
-       let response = await this.rest.get<Response<T, Error>>(this.url)
-       return  new Promise<Response<T, Error>>( (resolver, reject) => {
-           if (response.result == null) {
-               let error : ApiError = {name:"",message:"Null response returned"}
-               reject(error)
-           } else {
-               resolver(response.result)
-           }
-       })
+    return this.apiResponseHandler<T>()
    }
+
 }
 
 

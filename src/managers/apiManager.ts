@@ -10,6 +10,7 @@ export interface DataRequest {
 interface ApiManager {
     login(request: LoginRequest) : ApiRequest
     register(request: RegisterRequest) : ApiRequest
+    logout() : ApiRequest
 
     //Medicine/Remedy
     createMedicine() : ApiRequest
@@ -40,8 +41,12 @@ class ServiceManagerImpl implements ApiManager {
     }
     
     login(request: LoginRequest): ApiRequest {
-        return apiClient.post("/login", request)
+        return apiClient.post("/tokens", {"username":request.email,"user_password":request.password})
     }   
+
+    logout() : ApiRequest {
+        return apiClient.delete("tokens")
+    }
     
     register(request: RegisterRequest): ApiRequest {
         return apiClient.post("/register", request)

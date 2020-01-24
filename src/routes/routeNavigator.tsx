@@ -53,6 +53,6 @@ class RouteManager implements RouteNavigator {
 
 
 
-const routeManager: RouteNavigator = new RouteManager(history)
+const routeNavigator: RouteNavigator = new RouteManager(history)
 
-export default routeManager
+export default routeNavigator

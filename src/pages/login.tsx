@@ -3,11 +3,12 @@ import userManager from '../managers/userManager'
 import routeNavigator from "../routes/routeNavigator";
 
 function handleLogin() {
-   userManager.login({email:"test@gmail.com",password:"123456"}) .then(res => {
-
+   userManager.login({email: "somianew@gmail.com",password: "123456"}).then(res => {
+      routeNavigator.home()
    }).catch(error => {
-       routeNavigator.home()
-   })
+    console.log("Error "+error.code) 
+    alert(error.text) 
+  })
 }
 
 function handleRegisterFromLogin() {
@@ -17,11 +18,14 @@ function handleRegisterFromLogin() {
 const Login: React.FC = () => {
   return (
     <div>
+      <h1>Login</h1>
       Login Page
+      <br></br>
+      <br></br>
       <button onClick = {handleLogin}>Login</button>
-
-        <button onClick = {handleRegisterFromLogin}>Register</button>
-
+      <br></br>
+      <br></br>
+      <button onClick = {handleRegisterFromLogin}>Register</button>
     </div>
   );
 }

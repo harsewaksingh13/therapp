@@ -12,23 +12,35 @@ export interface UserManager {
     welcome() : void
     login(loginRequest: LoginRequest) : Promise<User>
     register(registerRequest: RegisterRequest) : Promise<User>
+    logout() : Promise<Boolean>
 }
 
+type ApiAuthResponse = {
+    token : string
+    user: UserResponse
+}
+
+type UserResponse = {
+    user_id : string
+    username: string
+}
 
 class UserManagerImpl implements UserManager {
 
     login(loginRequest: LoginRequest): Promise<User> {
         return new Promise<User>( (resolve,rejects) => {
-            apiManager.login(loginRequest).responseHandler<AuthResponse>().then(response => {
-                this.resolveUser(response,resolve)
+            apiManager.login(loginRequest).response<ApiAuthResponse>().then(res => {
+                let response = res.data
+                let authResponse : AuthResponse = {token:response.token,email:response.user.username,userId:response.user.user_id}
+                this.resolveUser(authResponse,resolve)
             }).catch(rejects)
         })
     }
 
     register(registerRequest: RegisterRequest) : Promise<User> {
         return new Promise<User>( (resolve,rejects) => {
-            apiManager.register(registerRequest).responseHandler<AuthResponse>().then(response => {
-               this.resolveUser(response,resolve)
+            apiManager.register(registerRequest).response<AuthResponse>().then(response => {
+               this.resolveUser(response.data,resolve)
             }).catch(rejects)
         })
     }
@@ -46,6 +58,16 @@ class UserManagerImpl implements UserManager {
         } else {
             routeNavigator.login()
         }
+    }
+
+    logout() : Promise<Boolean> {
+        return new Promise<Boolean> ( (resolve,rejects) => {
+            if(dataManager.hasSession()) {
+                dataManager.clearSession()
+            }
+            resolve(true)
+            routeNavigator.login()
+        })
     }
 }
 
