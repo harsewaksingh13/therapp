@@ -65,7 +65,7 @@ class ApiRequestHandler implements ApiRequest {
     }
 
     async apiResponseHandler<T>(): Promise<ApiResponse<T>> {
-        if(this.method == "post") {
+        if(this.method === "post") {
             let response = await this.rest.create<ApiResponse<T>>(this.url,this.parameters)
             return  new Promise<ApiResponse<T>>( (resolver, reject) => {
                 if (response.result == null) {

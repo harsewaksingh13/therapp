@@ -1,8 +1,11 @@
-import { createBrowserHistory } from 'history';
+import {History} from "history";
+import history from './history';
 
 interface RouteNavigator {
     login(): void
     register(): void
+
+    home(): void
 
     medicineDetails(id: string): void
     medicines(): void
@@ -13,12 +16,22 @@ interface RouteNavigator {
 }
 
 class RouteManager implements RouteNavigator {
-    
+
+    history : History
+
+    constructor(history: History) {
+        this.history = history
+    }
+
     login(): void {
-        throw new Error("Method not implemented.")
+        this.history.push("/login")
     } 
     register(): void {
-        throw new Error("Method not implemented.")
+        this.history.push("/register")
+    }
+
+    home(): void {
+        this.history.push("/home")
     }
 
     medicineDetails(id: string): void {
@@ -40,6 +53,6 @@ class RouteManager implements RouteNavigator {
 
 
 
-const routeManager: RouteNavigator = new RouteManager()
+const routeManager: RouteNavigator = new RouteManager(history)
 
 export default routeManager

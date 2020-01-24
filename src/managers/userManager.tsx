@@ -42,7 +42,7 @@ class UserManagerImpl implements UserManager {
 
     welcome() : void {
         if(dataManager.hasSession()){
-            routeNavigator.medicines()
+            routeNavigator.home()
         } else {
             routeNavigator.login()
         }
