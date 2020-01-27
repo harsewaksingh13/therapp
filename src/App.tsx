@@ -1,26 +1,9 @@
 import React, {useEffect} from "react";
-import userManager from './managers/userManager'
+import userManager from './data/userManager'
 import {BrowserRouter} from "react-router-dom";
-import Routes, {AppRouteBinder} from './routes/routes'
-import Login from "./pages/login";
-import Register from "./pages/register";
-import Home from "./pages/home";
+import Routes, {allRoutes, AppRouteBinder} from './routes/routes'
 
-const allRoutes: Array<AppRouteBinder> = [
-    {
-        key: "login",
-        path: "/login",
-        component: Login
-    },{
-        key: "register",
-        path: "/register",
-        component: Register
-    },{
-        key: "home",
-        path: "/home",
-        component: Home
-    }
-];
+
 
 const App: React.FC = () => {
 

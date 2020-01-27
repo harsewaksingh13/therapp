@@ -1,6 +1,6 @@
 import * as rm from 'typed-rest-client'
 import {HttpClient} from "typed-rest-client/HttpClient";
-import {ApiError, AppError} from "../models/apiError";
+import {ApiError, AppError} from "./models/apiError";
 
 
 export interface Response<T,E extends Error> {

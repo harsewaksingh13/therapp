@@ -1,8 +1,8 @@
-import {LoginRequest} from '../models'
-import {RegisterRequest} from '../models'
-import apiManager from './apiManager'
+import {LoginRequest} from '../api/models'
+import {RegisterRequest} from '../api/models'
+import apiManager from '../api/apiManager'
 import routeNavigator from '../routes/routeNavigator'
-import {AuthResponse} from "../models/authResponse";
+import {AuthResponse} from "../api/models/authResponse";
 import {User} from "../models/user";
 import dataManager from "./dataManager";
 

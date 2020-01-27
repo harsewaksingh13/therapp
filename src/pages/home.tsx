@@ -1,5 +1,5 @@
 import React from "react";
-import userManager from '../managers/userManager'
+import userManager from '../data/userManager'
 
 const handleLogout = () => {
     userManager.logout()

@@ -1,11 +1,6 @@
-import { LoginRequest, RegisterRequest } from "../models"
+import { LoginRequest, RegisterRequest } from "./models"
 import apiClient, {ApiClient, ApiRequest} from "./apiClient";
 
-
-//any date request to send to api
-export interface DataRequest {
-    asParameters() : Map<String,String>
-}
 
 interface ApiManager {
     login(request: LoginRequest) : ApiRequest

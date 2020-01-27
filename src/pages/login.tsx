@@ -1,9 +1,9 @@
 import React from 'react';
-import userManager from '../managers/userManager'
+import userManager from '../data/userManager'
 import routeNavigator from "../routes/routeNavigator";
 
 function handleLogin() {
-   userManager.login({email: "somianew@gmail.com",password: "123456"}).then(res => {
+   userManager.login({email: "test@gmail.com",password: "123456"}).then(res => {
       routeNavigator.home()
    }).catch(error => {
     console.log("Error "+error.code) 

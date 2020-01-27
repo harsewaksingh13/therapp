@@ -4,4 +4,3 @@ export type AuthResponse = {
     email : string
     userId : string
 }
-
