@@ -4,7 +4,7 @@ import routeNavigator from "../routes/routeNavigator";
 
 function handleLogin() {
    userManager.login({email: "test@gmail.com",password: "123456"}).then(res => {
-      routeNavigator.home()
+      routeNavigator.user().home()
    }).catch(error => {
     console.log("Error "+error.code) 
     alert(error.text) 
@@ -12,7 +12,7 @@ function handleLogin() {
 }
 
 function handleRegisterFromLogin() {
-    routeNavigator.register()
+    routeNavigator.user().register()
 }
 
 const Login: React.FC = () => {

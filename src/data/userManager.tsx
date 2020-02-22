@@ -54,9 +54,9 @@ class UserManagerImpl implements UserManager {
 
     welcome() : void {
         if(dataManager.hasSession()){
-            routeNavigator.home()
+            routeNavigator.user().home()
         } else {
-            routeNavigator.login()
+            routeNavigator.user().login()
         }
     }
 
@@ -66,7 +66,7 @@ class UserManagerImpl implements UserManager {
                 dataManager.clearSession()
             }
             resolve(true)
-            routeNavigator.login()
+            routeNavigator.user().login()
         })
     }
 }

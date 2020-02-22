@@ -1,6 +1,66 @@
 import {History} from "history";
 import history from './history';
 
+interface Navigator {
+    user() : UserNavigator
+    order() : OrderNavigator
+}
+
+
+
+interface UserNavigator {
+    login(): void
+    register(): void
+    home(): void
+}
+
+interface OrderNavigator {
+    orderDetails(id: string): void
+    orders(): void
+}
+
+class UserNavigatorImpl implements UserNavigator {
+    history : History
+
+    constructor(history: History) {
+        this.history = history
+    }
+
+    login(): void {
+        this.history.push("/login")
+    }
+    register(): void {
+        this.history.push("/register")
+    }
+
+    home(): void {
+        this.history.push("/home")
+    }
+
+}
+
+class NavigatorImpl implements Navigator {
+
+    userNavigator : UserNavigator;
+
+    history : History;
+
+    constructor(history: History) {
+        this.history = history;
+        this.userNavigator = new UserNavigatorImpl(history)
+    }
+
+
+    user(): UserNavigator {
+        return this.userNavigator
+    }
+
+    order(): OrderNavigator {
+        throw new Error("Method not implemented.");
+    }
+
+}
+
 interface RouteNavigator {
     login(): void
     register(): void
@@ -25,7 +85,7 @@ class RouteManager implements RouteNavigator {
 
     login(): void {
         this.history.push("/login")
-    } 
+    }
     register(): void {
         this.history.push("/register")
     }
@@ -53,6 +113,6 @@ class RouteManager implements RouteNavigator {
 
 
 
-const routeNavigator: RouteNavigator = new RouteManager(history)
+const routeNavigator: Navigator = new NavigatorImpl(history)
 
 export default routeNavigator
