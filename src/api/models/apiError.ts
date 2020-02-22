@@ -3,7 +3,3 @@ export interface ApiError extends Error {
     text: string;
 }
 
-export interface AppError extends Error{
-    name : string
-    message : string
-}

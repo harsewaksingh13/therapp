@@ -1,5 +1,5 @@
-import { LoginRequest, RegisterRequest } from "./models"
-import apiClient, {ApiClient, ApiRequest} from "./apiClient";
+import {ApiRequest, LoginRequest, RegisterRequest} from "./models"
+import apiClient, {ApiClient} from "./apiClient";
 
 
 interface ApiManager {
