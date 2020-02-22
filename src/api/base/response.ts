@@ -1,4 +1,3 @@
-export interface Response<T,E extends Error> {
+export interface Response<T> {
     data : T
-    error? : E;
 }
