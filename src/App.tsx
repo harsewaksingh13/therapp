@@ -2,6 +2,7 @@ import React, {useEffect} from "react";
 import userManager from './data/userManager'
 import {BrowserRouter} from "react-router-dom";
 import Routes, {allRoutes, AppRouteBinder} from './routes/routes'
+import {UserContextProvider} from "./context/userContext";
 
 
 
@@ -12,6 +13,7 @@ const App: React.FC = () => {
     });
 
     return (
+        <UserContextProvider>
         <BrowserRouter>
             <Routes routes={allRoutes}>
                 <div>
@@ -19,6 +21,7 @@ const App: React.FC = () => {
                 </div>
             </Routes>
         </BrowserRouter>
+        </UserContextProvider>
     );
 }
 

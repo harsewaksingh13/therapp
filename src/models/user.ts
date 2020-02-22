@@ -3,3 +3,10 @@ export type User = {
     lastName : string
     email : string
 }
+
+export enum UserAction {
+    Login = 'login',
+    Register = 'register',
+    Logout = 'logout',
+    UpdateProfile = 'updateProfile',
+}

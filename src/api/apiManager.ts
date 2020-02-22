@@ -36,15 +36,26 @@ class ServiceManagerImpl implements ApiManager {
     }
     
     login(request: LoginRequest): ApiRequest {
-        return apiClient.post("/tokens", {"username":request.email,"user_password":request.password})
+        return apiClient.query({query:"mutation loginMutation($input: UserInput) {\n" +
+                "  authenticateUser(input: $input) {\n" +
+                "    accessToken\n" +
+                "    refreshToken\n" +
+                "    user {\n" +
+                "        _id\n" +
+                "        alias\n" +
+                "        email\n" +
+                "    }\n" +
+                "  }\n" +
+                "}",variables:{input: {"email":request.email,"password":request.password}}})
+        // return apiClient.post("", {"username":request.email,"user_password":request.password})
     }   
 
     logout() : ApiRequest {
-        return apiClient.delete("tokens")
+        return apiClient.query({query:"",variables:""})
     }
     
     register(request: RegisterRequest): ApiRequest {
-        return apiClient.post("/register", request)
+        return apiClient.query({query:""})
     }
     createMedicine(): ApiRequest {
         throw new Error("Method not implemented.")

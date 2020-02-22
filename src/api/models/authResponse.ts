@@ -1,6 +1,15 @@
 
-export type AuthResponse = {
-    token : string
-    email : string
-    userId : string
+export interface AuthResponse extends AccessToken {
+    user: UserResponse
+}
+
+interface AccessToken  {
+    accessToken: string
+    refreshToken: string
+}
+
+type UserResponse = {
+    _id : string
+    alias: string
+    email: string
 }
