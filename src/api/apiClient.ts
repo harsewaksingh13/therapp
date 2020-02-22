@@ -37,7 +37,7 @@ class RestApiClient implements ApiClient {
 
 
 class ApiRequestHandler implements ApiRequest {
-    private httpClient: HttpClient;
+    private readonly httpClient: HttpClient;
     rest: rm.RestClient;
     method: string;
     headers?: any;
@@ -70,24 +70,26 @@ class ApiRequestHandler implements ApiRequest {
     }
 
     async responseHandler<T>(): Promise<T> {
+        let options = this.requestOptions();
+        console.log("Url => " + JSON.stringify(this.url));
+        console.log("Method => " + JSON.stringify(this.method));
+        console.log("Header => " + JSON.stringify(options));
         if (this.method === "post") {
-            let options = this.requestOptions();
-            console.log("request options " + JSON.stringify(options));
-            console.log("request body " + JSON.stringify(this.parameters));
+            console.log("Body => " + JSON.stringify(this.parameters));
             let response = await this.rest.create<T>(this.url, this.parameters, options);
             return this.validateResponse(response)
         } else if (this.method === "delete") {
-            let response = await this.rest.del<T>(this.url);
+            let response = await this.rest.del<T>(this.url, options);
             return this.validateResponse(response)
         } else {//if(this.method === "get")
-            let response = await this.rest.get<T>(this.url);
+            let response = await this.rest.get<T>(this.url,options);
             return this.validateResponse(response)
         }
     }
 
     private validateResponse<T>(response: rm.IRestResponse<T>): Promise<T> {
         return new Promise<T>((resolver, reject) => {
-            console.log("response " + JSON.stringify(response));
+            console.log("Response => " + JSON.stringify(response));
             //todo: handle statusCode : 200 or other
             if (response.result === null) {
                 let error: AppError = {name: "", message: "Null response returned"};
@@ -105,11 +107,9 @@ class ApiRequestHandler implements ApiRequest {
 
     private validateApiResponse<T>(response: ApiResponse<T>): Promise<ApiResponse<T>> {
         return new Promise<ApiResponse<T>>((resolver, reject) => {
-            console.log("response " + JSON.stringify(response));
             if (response.error === undefined || response.error === null) {
                 resolver(response)
             } else {
-                console.log("api error " + JSON.stringify(response))
                 reject(response.error)
             }
         })
