@@ -36,7 +36,18 @@ class ServiceManagerImpl implements ApiManager {
     }
     
     login(request: LoginRequest): ApiRequest {
-        return apiClient.post("/tokens", {"username":request.email,"user_password":request.password})
+        return  apiClient.query({query:"mutation loginMutation($input: UserInput) {\n" +
+                "  authenticateUser(input: $input) {\n" +
+                "    accessToken\n" +
+                "    refreshToken\n" +
+                "    user {\n" +
+                "        _id\n" +
+                "        alias\n" +
+                "        email\n" +
+                "    }\n" +
+                "  }\n" +
+                "}",variables:{input: {"email":request.email,"password":request.password}}})
+        // return apiClient.post("/tokens", {"username":request.email,"user_password":request.password})
     }   
 
     logout() : ApiRequest {

@@ -3,7 +3,7 @@ import {RegisterRequest} from '../api/models'
 import apiManager from '../api/apiManager'
 import routeNavigator from '../routes/routeNavigator'
 import {AuthResponse} from "../api/models/authResponse";
-import {User} from "../models/user";
+import {toUser, User} from "../models/user";
 import dataManager from "./dataManager";
 
 
@@ -15,24 +15,13 @@ export interface UserManager {
     logout() : Promise<Boolean>
 }
 
-type ApiAuthResponse = {
-    token : string
-    user: UserResponse
-}
-
-type UserResponse = {
-    user_id : string
-    username: string
-}
-
 class UserManagerImpl implements UserManager {
 
     login(loginRequest: LoginRequest): Promise<User> {
         return new Promise<User>( (resolve,rejects) => {
-            apiManager.login(loginRequest).response<ApiAuthResponse>().then(res => {
-                let response = res.data
-                let authResponse : AuthResponse = {token:response.token,email:response.user.username,userId:response.user.user_id}
-                this.resolveUser(authResponse,resolve)
+            apiManager.login(loginRequest).response<AuthResponse>().then(res => {
+                let response = res.data;
+                this.resolveUser(response,resolve)
             }).catch(rejects)
         })
     }
@@ -46,10 +35,8 @@ class UserManagerImpl implements UserManager {
     }
 
     private resolveUser = (response: AuthResponse, resolve : Function) => {
-        dataManager.session(response.email, response.userId, response.token);
-        //todo: handle api response
-        let user: User = {firstName: "Harsewak", lastName: "Singh", email: "hsingh@gmail.com"}
-        resolve(user)
+        dataManager.session(response.user.email, response.user._id, response.accessToken);
+        resolve(toUser(response.user))
     };
 
     welcome() : void {
@@ -61,17 +48,17 @@ class UserManagerImpl implements UserManager {
     }
 
     logout() : Promise<Boolean> {
-        return new Promise<Boolean> ( (resolve,rejects) => {
+        return new Promise<Boolean> ( (resolve) => {
             if(dataManager.hasSession()) {
                 dataManager.clearSession()
             }
-            resolve(true)
+            resolve(true);
             routeNavigator.user().login()
         })
     }
 }
 
-const userManager : UserManager = new UserManagerImpl()
+const userManager : UserManager = new UserManagerImpl();
 
 export default userManager
 

@@ -1,6 +1,10 @@
+import {UserResponse} from "./userResponse";
 
-export type AuthResponse = {
-    token : string
-    email : string
-    userId : string
+export interface AuthResponse extends AuthToken {
+    user : UserResponse
+}
+
+export type AuthToken = {
+    accessToken : string
+    refreshToken : string
 }

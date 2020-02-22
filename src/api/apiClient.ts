@@ -5,6 +5,10 @@ import {ApiRequest} from "./models";
 import {Response} from "./base/response";
 import {ApiResponse} from "./models";
 
+export interface GraphParameters<V> {
+    query: string
+    variables?: V
+}
 
 export interface ApiClient {
     post(url: string, parameters: any | null, headers?: Map<string, any> | null): ApiRequest
@@ -12,11 +16,13 @@ export interface ApiClient {
     get(url: string, headers?: Map<string, any> | null): ApiRequest
 
     delete(url: string, parameters?: any | null, headers?: Map<string, any> | null): ApiRequest
+
+    query<V>(request: GraphParameters<V>, headers?: Map<string, any> | null): ApiRequest
 }
 
 class RestApiClient implements ApiClient {
 
-    rest: rm.RestClient = new rm.RestClient("webapp", "https://api.84r.co");
+    rest: rm.RestClient = new rm.RestClient("webapp", "http://localhost:8000/");
 
     get(url: string, headers?: Map<string, any> | null): ApiRequest {
         return this.request(url, 'get', headers)
@@ -28,6 +34,10 @@ class RestApiClient implements ApiClient {
 
     delete(url: string, parameters: any | null, headers?: Map<string, any> | null): ApiRequest {
         return this.request(url, 'delete', headers, parameters)
+    }
+
+    query<V>(request: GraphParameters<V>, headers?: Map<string, any> | null): ApiRequest {
+        return this.post("graphql",request,headers)
     }
 
     private request(url: string, method: string, headers?: Map<string, string> | null, parameters?: Map<string, string> | null): ApiRequest {
@@ -101,16 +111,16 @@ class ApiRequestHandler implements ApiRequest {
     }
 
     async apiResponseHandler<T>(): Promise<ApiResponse<T>> {
-        let response = await this.responseHandler<ApiResponse<T>>()
+        let response = await this.responseHandler<ApiResponse<T>>();
         return this.validateApiResponse(response)
     }
 
     private validateApiResponse<T>(response: ApiResponse<T>): Promise<ApiResponse<T>> {
         return new Promise<ApiResponse<T>>((resolver, reject) => {
-            if (response.error === undefined || response.error === null) {
+            if (response.errors === undefined || response.errors === null) {
                 resolver(response)
             } else {
-                reject(response.error)
+                reject(response.errors[0])
             }
         })
     }
