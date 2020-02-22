@@ -1,5 +1,5 @@
 import React from 'react';
-import userManager from '../data/userManager'
+import userManager from '../../data/userManager'
 
 function handleRegister() {
   userManager.register({firstName: "Type", lastName:"Test", email:"test@gmail.com",password:"123456"})

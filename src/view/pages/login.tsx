@@ -1,5 +1,5 @@
 import React from 'react';
-import userManager from '../data/userManager'
+import userManager from '../../data/userManager'
 import routeNavigator from "../routes/routeNavigator";
 
 function handleLogin() {

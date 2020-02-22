@@ -22,7 +22,7 @@ class DataManagerHandler implements DataManager {
 
     hasSession(): boolean {
         let token = localStorage.getItem("Token")
-        return token != null && token.length > 0
+        return token !== null && token.length > 0
     }
 
     clearSession() : void {

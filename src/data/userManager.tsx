@@ -1,9 +1,9 @@
 import {LoginRequest} from '../api/models'
 import {RegisterRequest} from '../api/models'
 import apiManager from '../api/apiManager'
-import routeNavigator from '../routes/routeNavigator'
-import {AuthResponse} from "../api/models/authResponse";
-import {User} from "../models/user";
+import routeNavigator from '../view/routes/routeNavigator'
+import {AuthResponse} from "../api/models/user/authResponse";
+import {User} from "./models/user";
 import dataManager from "./dataManager";
 
 
@@ -29,7 +29,7 @@ class UserManagerImpl implements UserManager {
 
     login(loginRequest: LoginRequest): Promise<User> {
         return new Promise<User>( (resolve,rejects) => {
-            apiManager.login(loginRequest).response<ApiAuthResponse>().then(res => {
+            apiManager.user().login(loginRequest).response<ApiAuthResponse>().then(res => {
                 let response = res.data
                 let authResponse : AuthResponse = {token:response.token,email:response.user.username,userId:response.user.user_id}
                 this.resolveUser(authResponse,resolve)
@@ -39,7 +39,7 @@ class UserManagerImpl implements UserManager {
 
     register(registerRequest: RegisterRequest) : Promise<User> {
         return new Promise<User>( (resolve,rejects) => {
-            apiManager.register(registerRequest).response<AuthResponse>().then(response => {
+            apiManager.user().register(registerRequest).response<AuthResponse>().then(response => {
                this.resolveUser(response.data,resolve)
             }).catch(rejects)
         })
