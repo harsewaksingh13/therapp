@@ -1,40 +1,35 @@
 import {ApiRequest, LoginRequest, RegisterRequest} from "./models"
 import apiClient, {ApiClient} from "./apiClient";
 
-
-interface ApiManager {
+interface UserApi {
     login(request: LoginRequest) : ApiRequest
     register(request: RegisterRequest) : ApiRequest
     logout() : ApiRequest
-
-    //Medicine/Remedy
-    createMedicine() : ApiRequest
-    readMedicine() : ApiRequest
-    updateMedicine() : ApiRequest
-    deleteMedicine() : ApiRequest
-    readMedicines() : ApiRequest
-
-    //Orders/Repeats
-    createOrder() : ApiRequest
-    readOrder() : ApiRequest
-    updateOrder() : ApiRequest
-    deleteOrder() : ApiRequest
-    readOrders() : ApiRequest
 }
 
+interface OrderApi {
+    orders() : ApiRequest
+    order(id: string) : ApiRequest
+}
 
-class ServiceManagerImpl implements ApiManager {
-    
+interface ProductApi {
+    products() : ApiRequest
+    product(id: string) : ApiRequest
+}
+
+interface ApiManager {
+
+    user() : UserApi;
+}
+
+class UserApiManager implements UserApi {
+
     apiClient: ApiClient
 
     constructor(apiClient: ApiClient) {
         this.apiClient = apiClient
     }
 
-    readMedicines(): ApiRequest {
-        throw new Error("Method not implemented.")
-    }
-    
     login(request: LoginRequest): ApiRequest {
         return  apiClient.query({query:"mutation loginMutation($input: UserInput) {\n" +
                 "  authenticateUser(input: $input) {\n" +
@@ -48,42 +43,27 @@ class ServiceManagerImpl implements ApiManager {
                 "  }\n" +
                 "}",variables:{input: {"email":request.email,"password":request.password}}})
         // return apiClient.post("/tokens", {"username":request.email,"user_password":request.password})
-    }   
+    }
 
     logout() : ApiRequest {
         return apiClient.delete("tokens")
     }
-    
+
     register(request: RegisterRequest): ApiRequest {
         return apiClient.post("/register", request)
     }
-    createMedicine(): ApiRequest {
-        throw new Error("Method not implemented.")
-    }
-    readMedicine(): ApiRequest {
-        throw new Error("Method not implemented.")
-    }
-    updateMedicine(): ApiRequest {
-        throw new Error("Method not implemented.")
-    }
-    deleteMedicine(): ApiRequest {
-        throw new Error("Method not implemented.")
+}
+
+class ServiceManagerImpl implements ApiManager {
+
+    userApi : UserApi
+
+    constructor(apiClient: ApiClient) {
+        this.userApi = new UserApiManager(apiClient)
     }
 
-    createOrder(): ApiRequest {
-        throw new Error("Method not implemented.")
-    }
-    readOrder(): ApiRequest {
-        throw new Error("Method not implemented.")
-    }
-    updateOrder(): ApiRequest {
-        throw new Error("Method not implemented.")
-    }
-    deleteOrder(): ApiRequest {
-        throw new Error("Method not implemented.")
-    }
-    readOrders(): ApiRequest {
-        throw new Error("Method not implemented.")
+    user(): UserApi {
+        return this.userApi
     }
 
 }

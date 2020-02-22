@@ -19,7 +19,7 @@ class UserManagerImpl implements UserManager {
 
     login(loginRequest: LoginRequest): Promise<User> {
         return new Promise<User>( (resolve,rejects) => {
-            apiManager.login(loginRequest).response<AuthResponse>().then(res => {
+            apiManager.user().login(loginRequest).response<AuthResponse>().then(res => {
                 let response = res.data;
                 this.resolveUser(response,resolve)
             }).catch(rejects)
@@ -28,7 +28,7 @@ class UserManagerImpl implements UserManager {
 
     register(registerRequest: RegisterRequest) : Promise<User> {
         return new Promise<User>( (resolve,rejects) => {
-            apiManager.register(registerRequest).response<AuthResponse>().then(response => {
+            apiManager.user().register(registerRequest).response<AuthResponse>().then(response => {
                this.resolveUser(response.data,resolve)
             }).catch(rejects)
         })
