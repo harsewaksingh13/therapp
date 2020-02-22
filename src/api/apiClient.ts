@@ -1,6 +1,6 @@
 import * as rm from 'typed-rest-client'
 import {HttpClient} from "typed-rest-client/HttpClient";
-import {ApiError, AppError} from "./models";
+import {AppError} from "./models";
 import {ApiRequest} from "./models";
 import {Response} from "./base/response";
 import {ApiResponse} from "./models";
@@ -9,7 +9,7 @@ import {ApiResponse} from "./models";
 export interface ApiClient {
     post(url: string, parameters: any | null, headers?: Map<string, any> | null): ApiRequest
 
-    get(url: string, parameters?: any | null, headers?: Map<string, any> | null): ApiRequest
+    get(url: string, headers?: Map<string, any> | null): ApiRequest
 
     delete(url: string, parameters?: any | null, headers?: Map<string, any> | null): ApiRequest
 }
@@ -18,8 +18,8 @@ class RestApiClient implements ApiClient {
 
     rest: rm.RestClient = new rm.RestClient("webapp", "https://api.84r.co");
 
-    get(url: string, parameters?: any | null, headers?: Map<string, any> | null): ApiRequest {
-        return this.request(url, 'get', headers, parameters)
+    get(url: string, headers?: Map<string, any> | null): ApiRequest {
+        return this.request(url, 'get', headers)
     }
 
     post(url: string, parameters: any | null, headers?: Map<string, any> | null): ApiRequest {

@@ -20,7 +20,7 @@ interface OrderNavigator {
 }
 
 class UserNavigatorImpl implements UserNavigator {
-    history : History
+    history : History;
 
     constructor(history: History) {
         this.history = history
@@ -61,58 +61,6 @@ class NavigatorImpl implements Navigator {
 
 }
 
-interface RouteNavigator {
-    login(): void
-    register(): void
-
-    home(): void
-
-    medicineDetails(id: string): void
-    medicines(): void
-
-    orderDetails(id: string): void
-    orders(): void
-
-}
-
-class RouteManager implements RouteNavigator {
-
-    history : History
-
-    constructor(history: History) {
-        this.history = history
-    }
-
-    login(): void {
-        this.history.push("/login")
-    }
-    register(): void {
-        this.history.push("/register")
-    }
-
-    home(): void {
-        this.history.push("/home")
-    }
-
-    medicineDetails(id: string): void {
-        throw new Error("Method not implemented.")
-    }
-    medicines(): void {
-        throw new Error("Method not implemented.")
-    }
-
-
-    orderDetails(id: string): void {
-        throw new Error("Method not implemented.")
-    }
-    orders(): void {
-        throw new Error("Method not implemented.")
-    }
-
-}
-
-
-
-const routeNavigator: Navigator = new NavigatorImpl(history)
+const routeNavigator: Navigator = new NavigatorImpl(history);
 
 export default routeNavigator
