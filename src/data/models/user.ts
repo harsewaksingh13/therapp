@@ -1,4 +1,4 @@
-import {UserResponse} from "../api/models/userResponse";
+import {UserResponse} from "../../api/models/userResponse";
 
 export type User = {
     firstName : string

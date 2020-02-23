@@ -1,43 +1,13 @@
 import {History} from "history";
 import history from './history';
+import {UserNavigation, UserNavigator} from "./userNavigator";
+import {OrderNavigator} from "./orderNavigator";
 
 interface Navigator {
     user() : UserNavigator
     order() : OrderNavigator
 }
 
-
-
-interface UserNavigator {
-    login(): void
-    register(): void
-    home(): void
-}
-
-interface OrderNavigator {
-    orderDetails(id: string): void
-    orders(): void
-}
-
-class UserNavigatorImpl implements UserNavigator {
-    history : History;
-
-    constructor(history: History) {
-        this.history = history
-    }
-
-    login(): void {
-        this.history.push("/login")
-    }
-    register(): void {
-        this.history.push("/register")
-    }
-
-    home(): void {
-        this.history.push("/home")
-    }
-
-}
 
 class NavigatorImpl implements Navigator {
 
@@ -47,7 +17,7 @@ class NavigatorImpl implements Navigator {
 
     constructor(history: History) {
         this.history = history;
-        this.userNavigator = new UserNavigatorImpl(history)
+        this.userNavigator = new UserNavigation(history)
     }
 
 

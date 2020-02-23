@@ -1,7 +1,7 @@
 import React, {useEffect} from "react";
 import userManager from './data/userManager'
 import {BrowserRouter} from "react-router-dom";
-import Routes, {allRoutes} from './routes/routes'
+import Routes, {allRoutes} from './view/routes/routes'
 
 
 
