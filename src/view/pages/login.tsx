@@ -1,10 +1,10 @@
 import React from 'react';
 import userManager from '../../data/userManager'
-import routeNavigator from "../routes/routeNavigator";
+import navigator from "../navigation/appNavigator";
 
 function handleLogin() {
    userManager.login({email: "test@gmail.com",password: "123456"}).then(res => {
-      routeNavigator.user().home()
+       navigator.user().home()
    }).catch(error => {
     console.log("Error "+error.code);
     alert(error.message)
@@ -12,7 +12,7 @@ function handleLogin() {
 }
 
 function handleRegisterFromLogin() {
-    routeNavigator.user().register()
+    navigator.user().register()
 }
 
 const Login: React.FC = () => {

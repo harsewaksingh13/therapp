@@ -1,8 +1,26 @@
 import React, {useEffect} from "react";
 import userManager from './data/userManager'
-import {BrowserRouter} from "react-router-dom";
-import Routes, {allRoutes} from './view/routes/routes'
+import {BrowserRouter, Route, Router, Switch} from "react-router-dom";
+import history from "./view/navigation/history";
+import navigator from "./view/navigation/appNavigator";
+import {AppRoute} from "./view/navigation/appRoute";
 
+
+const Routes: React.FC = () => {
+    return (
+        <Router history={history}>
+            <Switch>
+                {navigator.appRoutes().map((route: AppRoute) => {
+                    return (
+                        <Route key={route.key} exact path={route.path}>
+                            <route.component/>
+                        </Route>
+                    )
+                })}
+            </Switch>
+        </Router>
+    )
+};
 
 
 const App: React.FC = () => {
@@ -13,13 +31,13 @@ const App: React.FC = () => {
 
     return (
         <BrowserRouter>
-            <Routes routes={allRoutes}>
+            <Routes >
                 <div>
                     Welcome
                 </div>
             </Routes>
         </BrowserRouter>
     );
-}
+};
 
 export default App;

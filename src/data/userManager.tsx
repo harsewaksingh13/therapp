@@ -1,7 +1,7 @@
 import {LoginRequest} from '../api/models'
 import {RegisterRequest} from '../api/models'
 import apiManager from '../api/apiManager'
-import routeNavigator from '../view/routes/routeNavigator'
+import routeNavigator from '../view/navigation/appNavigator'
 import {AuthResponse} from "../api/models/authResponse";
 import {toUser, User} from "./models/user";
 import dataManager from "./dataManager";
