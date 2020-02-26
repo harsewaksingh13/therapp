@@ -2,8 +2,8 @@ import {LoginRequest} from '../api/models'
 import {RegisterRequest} from '../api/models'
 import apiManager from '../api/apiManager'
 import routeNavigator from '../view/navigation/appNavigator'
-import {AuthResponse} from "../api/models/authResponse";
-import {toUser, User} from "./models/user";
+import {AuthResponse} from '../api/models/user/authResponse'
+import {User} from "./models/user";
 import dataManager from "./dataManager";
 
 
@@ -36,7 +36,7 @@ class UserManagerImpl implements UserManager {
 
     private resolveUser = (response: AuthResponse, resolve : Function) => {
         dataManager.session(response.user.email, response.user._id, response.accessToken);
-        resolve(toUser(response.user))
+        resolve(response.user)
     };
 
     welcome() : void {

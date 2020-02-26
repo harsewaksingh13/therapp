@@ -1,4 +1,3 @@
-import {History} from "history";
 import {AppRoute} from "./appRoute";
 import Login from "../pages/login";
 import Register from "../pages/register";

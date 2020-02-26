@@ -15,14 +15,14 @@ interface DataManager {
 class DataManagerHandler implements DataManager {
 
     session(email: string, id: string, token: string): void {
-        localStorage.setItem("Email", email)
-        localStorage.setItem("UserId", id)
+        localStorage.setItem("Email", email);
+        localStorage.setItem("UserId", id);
         localStorage.setItem("Token", token)
     }
 
     hasSession(): boolean {
-        let token = localStorage.getItem("Token")
-        return token != null && token.length > 0
+        let token = localStorage.getItem("Token");
+        return token !== null && token.length > 0
     }
 
     clearSession() : void {
@@ -38,14 +38,14 @@ class DataManagerHandler implements DataManager {
     }
 
     read<T>(key: string): T | null {
-        let item = localStorage.getItem(key)
-        if (item != null) {
+        let item = localStorage.getItem(key);
+        if (item !== null) {
             return JSON.parse(item)
         }
         return null
     }
 }
 
-const dataManager: DataManager = new DataManagerHandler()
+const dataManager: DataManager = new DataManagerHandler();
 
 export default dataManager
