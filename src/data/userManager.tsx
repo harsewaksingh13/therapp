@@ -1,10 +1,10 @@
 import {LoginRequest} from '../api/models'
 import {RegisterRequest} from '../api/models'
 import apiManager from '../api/apiManager'
-import routeNavigator from '../view/routes/routeNavigator'
 import {AuthResponse} from "../api/models/user/authResponse";
 import {User} from "./models/user";
 import dataManager from "./dataManager";
+import appNavigator from '../view/navigation/appNavigator'
 
 
 export interface UserManager {
@@ -54,9 +54,9 @@ class UserManagerImpl implements UserManager {
 
     welcome() : void {
         if(dataManager.hasSession()){
-            routeNavigator.user().home()
+            appNavigator.user().home()
         } else {
-            routeNavigator.user().login()
+            appNavigator.user().login()
         }
     }
 
@@ -66,7 +66,7 @@ class UserManagerImpl implements UserManager {
                 dataManager.clearSession()
             }
             resolve(true)
-            routeNavigator.user().login()
+            appNavigator.user().login()
         })
     }
 }
