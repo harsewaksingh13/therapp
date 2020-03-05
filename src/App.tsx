@@ -4,6 +4,7 @@ import {BrowserRouter, Route, Router, Switch} from "react-router-dom";
 import history from "./view/navigation/history";
 import appNavigator from "./view/navigation/appNavigator";
 import {AppRoute} from "./view/navigation/appRoute";
+import {AppProvider} from "./view/context/appContext";
 
 
 const Routes: React.FC = () => {
@@ -28,15 +29,16 @@ const App: React.FC = () => {
     useEffect(() => {
         userManager.welcome()
     });
-
     return (
-        <BrowserRouter>
-            <Routes >
-                <div>
-                    Welcome
-                </div>
-            </Routes>
-        </BrowserRouter>
+        <AppProvider>
+                <BrowserRouter>
+                    <Routes>
+                        <div>
+                            Welcome
+                        </div>
+                    </Routes>
+                </BrowserRouter>
+        </AppProvider>
     );
 };
 

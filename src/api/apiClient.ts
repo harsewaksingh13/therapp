@@ -5,7 +5,6 @@ import {ApiRequest} from "./models";
 import {Response} from "./base/response";
 import {ApiResponse} from "./models";
 
-
 export interface ApiClient {
     post(url: string, parameters: any | null, headers?: Map<string, any> | null): ApiRequest
 
@@ -14,9 +13,12 @@ export interface ApiClient {
     delete(url: string, parameters?: any | null, headers?: Map<string, any> | null): ApiRequest
 }
 
+const host = "";
+const clientId = "";
+
 class RestApiClient implements ApiClient {
 
-    rest: rm.RestClient = new rm.RestClient("webapp", "https://api.84r.co");
+    rest: rm.RestClient = new rm.RestClient("webapp", host);
 
     get(url: string, headers?: Map<string, any> | null): ApiRequest {
         return this.request(url, 'get', headers)
@@ -53,11 +55,11 @@ class ApiRequestHandler implements ApiRequest {
         this.parameters = parameters;
 
 
-        if (headers === undefined || headers === null) {
+
             this.headers = {
-                "Content-Type": "application/json",
+                "client-id":clientId
             }
-        }
+
     }
 
     cancel(): void {

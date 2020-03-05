@@ -10,7 +10,7 @@ import appNavigator from '../view/navigation/appNavigator'
 export interface UserManager {
     //display welcome page or handle redirection logic depending session
     welcome() : void
-    login(loginRequest: LoginRequest) : Promise<User>
+    login(loginRequest: LoginRequest) : Promise<ApiAuthResponse>
     register(registerRequest: RegisterRequest) : Promise<User>
     logout() : Promise<Boolean>
 }
@@ -27,12 +27,12 @@ type UserResponse = {
 
 class UserManagerImpl implements UserManager {
 
-    login(loginRequest: LoginRequest): Promise<User> {
-        return new Promise<User>( (resolve,rejects) => {
-            apiManager.user().login(loginRequest).response<ApiAuthResponse>().then(res => {
-                let response = res.data
-                let authResponse : AuthResponse = {token:response.token,email:response.user.username,userId:response.user.user_id}
-                this.resolveUser(authResponse,resolve)
+    login(loginRequest: LoginRequest): Promise<ApiAuthResponse> {
+        return new Promise<ApiAuthResponse>( (resolve,rejects) => {
+            apiManager.user().login(loginRequest).response<Array<ApiAuthResponse>>().then(res => {
+                let response = res.data[0];
+                dataManager.session({email:response.user.username,userId:response.user.user_id,token:response.token});
+                resolve(response)
             }).catch(rejects)
         })
     }
@@ -46,9 +46,9 @@ class UserManagerImpl implements UserManager {
     }
 
     private resolveUser = (response: AuthResponse, resolve : Function) => {
-        dataManager.session(response.email, response.userId, response.token);
+        // dataManager.session(response.email, response.userId, response.token);
         //todo: handle api response
-        let user: User = {firstName: "Harsewak", lastName: "Singh", email: "hsingh@gmail.com"}
+        let user: User = {firstName: "Harsewak", lastName: "Singh", email: "test@gmail.com"}
         resolve(user)
     };
 
@@ -65,13 +65,13 @@ class UserManagerImpl implements UserManager {
             if(dataManager.hasSession()) {
                 dataManager.clearSession()
             }
-            resolve(true)
+            resolve(true);
             appNavigator.user().login()
         })
     }
 }
 
-const userManager : UserManager = new UserManagerImpl()
+const userManager : UserManager = new UserManagerImpl();
 
 export default userManager
 
