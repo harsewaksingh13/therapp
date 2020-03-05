@@ -1,11 +1,10 @@
 import {LoginRequest} from '../api/models'
 import {RegisterRequest} from '../api/models'
 import apiManager from '../api/apiManager'
-import routeNavigator from '../view/navigation/appNavigator'
 import {AuthResponse} from '../api/models/user/authResponse'
 import {User} from "./models/user";
 import dataManager from "./dataManager";
-
+import navigator from "../view/navigation/appNavigator";
 
 export interface UserManager {
     //display welcome page or handle redirection logic depending session
@@ -13,6 +12,16 @@ export interface UserManager {
     login(loginRequest: LoginRequest) : Promise<User>
     register(registerRequest: RegisterRequest) : Promise<User>
     logout() : Promise<Boolean>
+}
+
+type ApiAuthResponse = {
+    token : string
+    user: UserResponse
+}
+
+type UserResponse = {
+    user_id : string
+    username: string
 }
 
 class UserManagerImpl implements UserManager {
@@ -35,15 +44,15 @@ class UserManagerImpl implements UserManager {
     }
 
     private resolveUser = (response: AuthResponse, resolve : Function) => {
-        dataManager.session(response.user.email, response.user._id, response.accessToken);
+        dataManager.session({token:response.accessToken,userId:response.user._id,email:response.user.email});
         resolve(response.user)
     };
 
     welcome() : void {
         if(dataManager.hasSession()){
-            routeNavigator.user().home()
+            navigator.user().home()
         } else {
-            routeNavigator.user().login()
+            navigator.user().login()
         }
     }
 
@@ -53,7 +62,7 @@ class UserManagerImpl implements UserManager {
                 dataManager.clearSession()
             }
             resolve(true);
-            routeNavigator.user().login()
+            navigator.user().login()
         })
     }
 }

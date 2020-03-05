@@ -20,9 +20,12 @@ export interface ApiClient {
     query<V>(request: GraphParameters<V>, headers?: Map<string, any> | null): ApiRequest
 }
 
+const host = "http://localhost:8000/";
+const clientId = "";
+
 class RestApiClient implements ApiClient {
 
-    rest: rm.RestClient = new rm.RestClient("webapp", "http://localhost:8000/");
+    rest: rm.RestClient = new rm.RestClient("webapp", host);
 
     get(url: string, headers?: Map<string, any> | null): ApiRequest {
         return this.request(url, 'get', headers)
@@ -65,7 +68,7 @@ class ApiRequestHandler implements ApiRequest {
 
         if (headers === undefined || headers === null) {
             this.headers = {
-                "Content-Type": "application/json",
+                "client-id":clientId
             }
         }
     }
@@ -120,7 +123,7 @@ class ApiRequestHandler implements ApiRequest {
             if (response.errors === undefined || response.errors === null) {
                 resolver(response)
             } else {
-                reject(response.errors[0])
+                reject(response.errors)
             }
         })
     }
