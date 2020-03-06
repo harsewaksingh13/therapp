@@ -1,4 +1,4 @@
-import {LoginRequest} from '../models'
+import {LoginRequest} from '../index'
 
 export interface RegisterRequest extends LoginRequest  {
     firstName : string

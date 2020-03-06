@@ -1,9 +1,5 @@
 export interface ApiError extends Error {
-    code: string;
+    code: bigint;
     text: string;
 }
 
-export interface AppError extends Error{
-    name : string
-    message : string
-}

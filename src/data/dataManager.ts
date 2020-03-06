@@ -1,31 +1,48 @@
+import {Session} from "./models/session";
+
 interface DataManager {
-    session(email: string, id: string, token: string): void
+    session(session: Session): void
+
+    readSession() : Session
 
     hasSession(): boolean
 
-    clearSession() : void
+    clearSession(): void
 
     saveObj<T extends Object>(obj: T): void
 
     save<T>(key: string, obj: T): void
 
     read<T>(key: string): T | null
+
+    /***
+     *  read the saved object for key, provide initial value to return if object don't exist
+     *  */
+    readObject<T>(key: string, initial: T): T
 }
 
 class DataManagerHandler implements DataManager {
 
-    session(email: string, id: string, token: string): void {
-        localStorage.setItem("Email", email)
-        localStorage.setItem("UserId", id)
-        localStorage.setItem("Token", token)
+    session(session: Session): void {
+        localStorage.setItem("Email", session.email)
+        localStorage.setItem("UserId", session.userId)
+        localStorage.setItem("Token", session.token)
+    }
+
+    readSession() : Session {
+       return {email: this.getItem("Email") || "", token: this.getItem("Token") || "", userId: this.getItem("UserId") || ""}
+    }
+
+    private getItem(key: string) : string | null {
+        return localStorage.getItem(key)
     }
 
     hasSession(): boolean {
-        let token = localStorage.getItem("Token")
-        return token != null && token.length > 0
+        let token = localStorage.getItem("Token");
+        return token !== null && token.length > 0
     }
 
-    clearSession() : void {
+    clearSession(): void {
         localStorage.clear()
     }
 
@@ -38,14 +55,23 @@ class DataManagerHandler implements DataManager {
     }
 
     read<T>(key: string): T | null {
-        let item = localStorage.getItem(key)
-        if (item != null) {
+        let item = localStorage.getItem(key);
+        if (item !== null) {
             return JSON.parse(item)
         }
         return null
     }
+
+    readObject<T>(key: string, initial: T): T {
+        let obj = this.read<T>(key)
+        if (obj) {
+            return obj
+        } else {
+            return initial
+        }
+    }
 }
 
-const dataManager: DataManager = new DataManagerHandler()
+const dataManager: DataManager = new DataManagerHandler();
 
 export default dataManager

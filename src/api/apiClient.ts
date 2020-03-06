@@ -1,5 +1,9 @@
 import * as rm from 'typed-rest-client'
 import {HttpClient} from "typed-rest-client/HttpClient";
+import {AppError} from "./models";
+import {ApiRequest} from "./models";
+import {Response} from "./base/response";
+import {ApiResponse} from "./models";
 import {ApiError, AppError} from "./models/apiError";
 
 import {ApolloClient} from 'apollo-client';
@@ -8,29 +12,13 @@ import {InMemoryCache} from 'apollo-cache-inmemory';
 import {gql} from "apollo-boost";
 
 
-export interface Response<T, E extends Error> {
-    data: T
-    error?: E;
-}
-
-export interface ApiResponse<T> extends Response <T, ApiError> {
-    error?: ApiError
-}
-
-export interface ApiRequest {
-    cancel(): void
-
-    response<T>(): Promise<Response<T, Error>>
-
-}
-
-export interface GraphRequest<V> {
+export interface GraphParameters<V> {
     query: string
     variables?: V
 }
 
 export interface ApiClient {
-    query<V>(request: GraphRequest<V>, headers?: Map<string, any> | null): ApiRequest
+    query<V>(request: GraphParameters<V>, headers?: Map<string, any> | null): ApiRequest
 }
 
 
@@ -48,7 +36,7 @@ class ApolloGraphClient implements ApiClient {
         cache: new InMemoryCache()
     });
 
-    query<V>(request: GraphRequest<V>, headers?: Map<string, any> | null): ApiRequest {
+    query<V>(request: GraphParameters<V>, headers?: Map<string, any> | null): ApiRequest {
         return new ApiGraphRequestHandler(this.client, request)
     }
 }
@@ -120,6 +108,9 @@ class ApiGraphRequestHandler<C, V> implements ApiRequest {
     }
 
 
+    responseExact<T>(): Promise<T> {
+        return this.responseHandler()
+    }
 }
 
 const apiClient: ApiClient = new ApolloGraphClient();

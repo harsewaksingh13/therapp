@@ -1,11 +1,10 @@
 import {LoginRequest} from '../api/models'
 import {RegisterRequest} from '../api/models'
 import apiManager from '../api/apiManager'
-import routeNavigator from '../routes/routeNavigator'
-import {AuthResponse} from "../api/models/authResponse";
-import {User} from "../models/user";
+import {AuthResponse} from '../api/models/user/authResponse'
+import {User} from "./models/user";
 import dataManager from "./dataManager";
-
+import navigator from "../view/navigation/appNavigator";
 
 export interface UserManager {
     //display welcome page or handle redirection logic depending session
@@ -21,10 +20,8 @@ class UserManagerImpl implements UserManager {
 
     login(loginRequest: LoginRequest): Promise<User> {
         return new Promise<User>( (resolve,rejects) => {
-            apiManager.login(loginRequest).response<AuthResponse>().then(res => {
-                let response = res.data
-                console.log("apiManager.login res "+JSON.stringify(res))
-                console.log("apiManager.login response data "+JSON.stringify(response))
+            apiManager.user().login(loginRequest).response<AuthResponse>().then(res => {
+                let response = res.data;
                 this.resolveUser(response,resolve)
             }).catch(rejects)
         })
@@ -32,42 +29,37 @@ class UserManagerImpl implements UserManager {
 
     register(registerRequest: RegisterRequest) : Promise<User> {
         return new Promise<User>( (resolve,rejects) => {
-            apiManager.register(registerRequest).response<AuthResponse>().then(response => {
+            apiManager.user().register(registerRequest).response<AuthResponse>().then(response => {
                this.resolveUser(response.data,resolve)
             }).catch(rejects)
         })
     }
 
     private resolveUser = (response: AuthResponse, resolve : Function) => {
-
-        dataManager.session(response.user.email, response.user._id, response.accessToken);
-
-        let user: User = {email:response.user.email, lastName: "",firstName:""}
-        resolve(user)
+        dataManager.session({token:response.accessToken,userId:response.user._id,email:response.user.email});
+        resolve(response.user)
     };
 
     welcome() : void {
         if(dataManager.hasSession()){
-            routeNavigator.user().home()
+            navigator.user().home()
         } else {
-            routeNavigator.user().login()
+            navigator.user().login()
         }
     }
 
     logout() : Promise<Boolean> {
-        return new Promise<Boolean> ( (resolve,rejects) => {
+        return new Promise<Boolean> ( (resolve) => {
             if(dataManager.hasSession()) {
                 dataManager.clearSession()
             }
-            resolve(true)
-            routeNavigator.user().login()
+            resolve(true);
+            navigator.user().login()
         })
     }
 }
 
-
-
-const userManager : UserManager = new UserManagerImpl()
+const userManager : UserManager = new UserManagerImpl();
 
 export default userManager
 
