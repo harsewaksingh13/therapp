@@ -30,8 +30,8 @@ export const UserProvider = ({children}: UserProviderProps) => {
                 appActions?.session(dataManager.readSession());
                 appActions?.done()
             }).catch(error => {
-                console.log("Error "+error.code);
-                alert(error.text);
+                console.log("Error "+JSON.stringify(error));
+                alert(error.message);
             })
         },
         logout(): void {

@@ -1,10 +1,15 @@
-import {ApiRequest, LoginRequest, RegisterRequest} from "../models";
+import {ApiRequest, LoginRequest, RegisterRequest, Subscriber} from "../models";
 import {ApiClient} from "../apiClient";
+
+export type Message = {
+ text : string
+}
 
 export interface UserApi {
     login(request: LoginRequest) : ApiRequest
     register(request: RegisterRequest) : ApiRequest
     logout() : ApiRequest
+    messages() : ApiRequest
 }
 
 export class UserApiManager implements  UserApi {
@@ -30,10 +35,20 @@ export class UserApiManager implements  UserApi {
     }
 
     logout(): ApiRequest {
-        return this.apiClient.delete("tokens")
+        return this.apiClient.query({query:""})
     }
 
     register(request: RegisterRequest): ApiRequest {
-        return this.apiClient.post("/register", request)
+        return this.apiClient.query({query:""})
+    }
+
+    messages(): ApiRequest {
+        return this.apiClient.subscription({
+            query: "subscription {\n" +
+                "  createMessage {\n" +
+                "    text\n" +
+                "  }\n" +
+                "}\n"
+        ,variables: {}})
     }
 }

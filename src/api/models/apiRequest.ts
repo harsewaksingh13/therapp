@@ -1,14 +1,18 @@
 import {Request} from "../base/request";
 import {Response} from "../base/response";
 
+export interface Subscriber<T> {
+    update(res : T) : void
+}
+
 export interface ApiRequest extends Request {
     /***
-     *  Response is wrapped in data object
+     *  subscribe to real-time updates
      *  */
-    response<T>(): Promise<Response<T>>
+    subscribe<T>(subscriber: Subscriber<T>): void
 
     /**
      * Response is exact as T
      * */
-    responseExact<T>(): Promise<T>
+    response<T>(): Promise<T>
 }

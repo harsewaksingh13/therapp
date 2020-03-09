@@ -1,10 +1,11 @@
-import {LoginRequest} from '../api/models'
+import {LoginRequest, Subscriber} from '../api/models'
 import {RegisterRequest} from '../api/models'
 import apiManager from '../api/apiManager'
 import {AuthResponse} from '../api/models/user/authResponse'
 import {User} from "./models/user";
 import dataManager from "./dataManager";
 import navigator from "../view/navigation/appNavigator";
+import {Message} from "../api/apis/userApi";
 
 export interface UserManager {
     //display welcome page or handle redirection logic depending session
@@ -12,6 +13,7 @@ export interface UserManager {
     login(loginRequest: LoginRequest) : Promise<User>
     register(registerRequest: RegisterRequest) : Promise<User>
     logout() : Promise<Boolean>
+    messages(subscriber: Subscriber<Message>) : void
 }
 
 
@@ -21,8 +23,7 @@ class UserManagerImpl implements UserManager {
     login(loginRequest: LoginRequest): Promise<User> {
         return new Promise<User>( (resolve,rejects) => {
             apiManager.user().login(loginRequest).response<AuthResponse>().then(res => {
-                let response = res.data;
-                this.resolveUser(response,resolve)
+                this.resolveUser(res,resolve)
             }).catch(rejects)
         })
     }
@@ -30,7 +31,7 @@ class UserManagerImpl implements UserManager {
     register(registerRequest: RegisterRequest) : Promise<User> {
         return new Promise<User>( (resolve,rejects) => {
             apiManager.user().register(registerRequest).response<AuthResponse>().then(response => {
-               this.resolveUser(response.data,resolve)
+               this.resolveUser(response,resolve)
             }).catch(rejects)
         })
     }
@@ -43,6 +44,11 @@ class UserManagerImpl implements UserManager {
     welcome() : void {
         if(dataManager.hasSession()){
             navigator.user().home()
+            this.messages( new class implements Subscriber<Message> {
+                update(message: Message): void {
+                    console.log("New message received "+message.text)
+                }
+            })
         } else {
             navigator.user().login()
         }
@@ -56,6 +62,10 @@ class UserManagerImpl implements UserManager {
             resolve(true);
             navigator.user().login()
         })
+    }
+
+    messages(subscriber: Subscriber<Message>) {
+        apiManager.user().messages().subscribe(subscriber)
     }
 }
 

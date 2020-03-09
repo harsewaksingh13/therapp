@@ -1,10 +1,4 @@
-import * as rm from 'typed-rest-client'
-import {HttpClient} from "typed-rest-client/HttpClient";
-import {AppError} from "./models";
-import {ApiRequest} from "./models";
-import {Response} from "./base/response";
-import {ApiResponse} from "./models";
-import {ApiError, AppError} from "./models/apiError";
+import {ApiRequest, AppError, Subscriber} from "./models";
 
 import {ApolloClient} from 'apollo-client';
 import {HttpLink} from 'apollo-link-http';
@@ -19,6 +13,8 @@ export interface GraphParameters<V> {
 
 export interface ApiClient {
     query<V>(request: GraphParameters<V>, headers?: Map<string, any> | null): ApiRequest
+
+    subscription<V>(request: GraphParameters<V>, headers?: Map<string, any> | null): ApiRequest
 }
 
 
@@ -31,12 +27,19 @@ class ApolloGraphClient implements ApiClient {
         },
     });
 
+
+
     client = new ApolloClient({
         link: this.httpLink,
-        cache: new InMemoryCache()
+        cache: new InMemoryCache(),
+        typeDefs: ""
     });
 
     query<V>(request: GraphParameters<V>, headers?: Map<string, any> | null): ApiRequest {
+        return new ApiGraphRequestHandler(this.client, request)
+    }
+
+    subscription<V>(request: GraphParameters<V>, headers?: Map<string, any> | null): ApiRequest {
         return new ApiGraphRequestHandler(this.client, request)
     }
 }
@@ -44,72 +47,74 @@ class ApolloGraphClient implements ApiClient {
 //C is cache, V is variable type
 class ApiGraphRequestHandler<C, V> implements ApiRequest {
     client: ApolloClient<C>;
-    request: GraphRequest<V>;
+    parameters: GraphParameters<V>;
 
-    constructor(client: ApolloClient<C>, request: GraphRequest<V>,) {
+    constructor(client: ApolloClient<C>, request: GraphParameters<V>,) {
         this.client = client;
-        this.request = request
+        this.parameters = request
     }
 
     cancel(): void {
-
     }
 
-    response<T>(): Promise<Response<T, Error>> {
-        return this.apiResponseHandler()
-    }
-
-    async apiResponseHandler<T>(): Promise<ApiResponse<T>> {
-        let gqlNode = gql(this.request.query);
-        console.log("query " + this.request.query)
-        console.log("variables " + JSON.stringify(this.request.variables))
-        await this.client.clearStore()
-        let response: ApiResponse<T>;
-        if (this.request.query.includes("mutation")) {
-            console.log("mutation")
-            let result = await this.client.mutate({
-                mutation: gqlNode,
-                variables: this.request.variables
-            });
-            console.log("result " + JSON.stringify(result));
-
-            let errors = result.errors
-            console.log("errors " + errors)
-            let error
-            if (errors) {
-// let apiError : ApiError = {code:errors[0]}
-                error = {message: errors[0].message, code: errors[0].name, name: "", text: ""}
-            } else {
-                let data = result.data
-                let firstKey = Object.keys(data!)[0];
-                result.data = result.data![firstKey]
-                let apiResponse: ApiResponse<T> = {data: result.data, error: error}
-                console.log("result data" + JSON.stringify(result));
-                response = apiResponse
+    async responseHandler<T>(): Promise<T> {
+        let gqlNode = gql(this.parameters.query);
+        if (this.parameters.query.includes("mutation")) {
+            console.log("mutation " + this.parameters.query);
+            try {
+                let result = await this.client.mutate({
+                    mutation: gqlNode,
+                    variables: this.parameters.variables,
+                });
+                console.log("result" + JSON.stringify(result));
+                return this.validateResponse<T>(this.filterResult(result))
+            } catch (graphqlErrors) {
+                throw graphqlErrors.graphQLErrors[0]
             }
+
         } else {
-            let result = await this.client.query<ApiResponse<T>>({query: gqlNode, variables: this.request.variables});
-
-            response = result.data
-
+            console.log("query " + this.parameters.query);
+            let result = await this.client.query<T>({query: gqlNode, variables: this.parameters.variables});
+            return this.validateResponse<T>(result.data)
         }
-        console.log("before promise")
-        return new Promise<ApiResponse<T>>((resolver, reject) => {
-            console.log("in promise response " + JSON.stringify(response));
-            if (response.error === undefined || response.error === null) {
-                console.log("no api error");
+
+    }
+
+    private filterResult<T>(result: any): T | null {
+        if (result.data) {
+            let firstKey = Object.keys(result.data)[0];
+            result = result.data[firstKey];
+            result = {data: result};
+            console.log("result data" + JSON.stringify(result));
+            return result.data
+        }
+        return null
+    }
+
+    private validateResponse<T>(response: T | undefined | null): Promise<T> {
+        return new Promise<T>((resolver, reject) => {
+            console.log("Response => " + JSON.stringify(response));
+            if (response) {
                 resolver(response)
             } else {
-                //api returned error
-                console.log("data is null reject with error" + JSON.stringify(response.error));
-                reject(response.error)
+                let error: AppError = {name: "", message: "Null response returned"};
+                reject(error)
             }
         })
     }
 
+    response<T>(): Promise<T> {
+        return this.responseHandler<T>()
+    }
 
-    responseExact<T>(): Promise<T> {
-        return this.responseHandler()
+    subscribe<T>(subscriber: Subscriber<T>): void {
+        let gqlNode = gql(this.parameters.query);
+        this.client.subscribe({query: gqlNode, variables: this.parameters.variables}).subscribe(result => {
+            let response = this.filterResult<T>(result.data);
+            if (response) {
+                subscriber.update(response)
+            }
+        })
     }
 }
 
