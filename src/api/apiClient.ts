@@ -1,9 +1,12 @@
-import {ApiRequest, AppError, Subscriber} from "./models";
+import {ApiRequest, AppError, Subscriber, Subscription} from "./models";
+import {split} from 'apollo-link';
+import {getMainDefinition} from 'apollo-utilities';
 
 import {ApolloClient} from 'apollo-client';
 import {HttpLink} from 'apollo-link-http';
 import {InMemoryCache} from 'apollo-cache-inmemory';
 import {gql} from "apollo-boost";
+import {WebSocketLink} from "apollo-link-ws";
 
 
 export interface GraphParameters<V> {
@@ -17,20 +20,42 @@ export interface ApiClient {
     subscription<V>(request: GraphParameters<V>, headers?: Map<string, any> | null): ApiRequest
 }
 
+const host = "http://localhost:9000";
 
 class ApolloGraphClient implements ApiClient {
 
     httpLink = new HttpLink({
-        uri: "http://localhost:8000/graphql",
+        uri: `${host}/graphql`,
         headers: {
             "x-token": localStorage.getItem("token")
         },
     });
 
 
+    wsLink = new WebSocketLink({
+        uri: `ws://localhost:9000/graphql`,
+        options: {
+            reconnect: true
+        }
+    });
+
+    // using the ability to split links, you can send data to each link
+// depending on what kind of operation is being sent
+    link = split(
+        // split based on operation type
+        ({query}) => {
+            const definition = getMainDefinition(query);
+            return (
+                definition.kind === 'OperationDefinition' &&
+                definition.operation === 'subscription'
+            );
+        },
+        this.wsLink,
+        this.httpLink,
+    );
 
     client = new ApolloClient({
-        link: this.httpLink,
+        link: this.link,
         cache: new InMemoryCache(),
         typeDefs: ""
     });
@@ -66,7 +91,6 @@ class ApiGraphRequestHandler<C, V> implements ApiRequest {
                     mutation: gqlNode,
                     variables: this.parameters.variables,
                 });
-                console.log("result" + JSON.stringify(result));
                 return this.validateResponse<T>(this.filterResult(result))
             } catch (graphqlErrors) {
                 throw graphqlErrors.graphQLErrors[0]
@@ -80,20 +104,22 @@ class ApiGraphRequestHandler<C, V> implements ApiRequest {
 
     }
 
-    private filterResult<T>(result: any): T | null {
-        if (result.data) {
-            let firstKey = Object.keys(result.data)[0];
-            result = result.data[firstKey];
-            result = {data: result};
-            console.log("result data" + JSON.stringify(result));
-            return result.data
+    private filterResult = <T>(result: any): T | null => {
+        if (result) {
+            console.log("Response Result => " + JSON.stringify(result));
+            if (result.data) {
+                let firstKey = Object.keys(result.data)[0];
+                result = result.data[firstKey];
+                result = {data: result};
+                console.log("Response Result Data =>" + JSON.stringify(result));
+                return result.data
+            }
         }
         return null
-    }
+    };
 
     private validateResponse<T>(response: T | undefined | null): Promise<T> {
         return new Promise<T>((resolver, reject) => {
-            console.log("Response => " + JSON.stringify(response));
             if (response) {
                 resolver(response)
             } else {
@@ -107,14 +133,19 @@ class ApiGraphRequestHandler<C, V> implements ApiRequest {
         return this.responseHandler<T>()
     }
 
-    subscribe<T>(subscriber: Subscriber<T>): void {
+    subscribe<T>(subscriber: Subscriber<T>): Subscription {
         let gqlNode = gql(this.parameters.query);
-        this.client.subscribe({query: gqlNode, variables: this.parameters.variables}).subscribe(result => {
-            let response = this.filterResult<T>(result.data);
+        let subscription = this.client.subscribe({query: gqlNode, variables: this.parameters.variables}).subscribe(result => {
+            let response = this.filterResult<T>(result);
             if (response) {
                 subscriber.update(response)
             }
-        })
+        });
+        return  {
+            unsubscribe(): void {
+                subscription.unsubscribe()
+            }
+        }
     }
 }
 
