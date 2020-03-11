@@ -1,13 +1,9 @@
-import {ApiRequest, AppError, Subscriber, Subscription} from "./models";
-import {split} from 'apollo-link';
-import {getMainDefinition} from 'apollo-utilities';
-
-import {ApolloClient} from 'apollo-client';
-import {HttpLink} from 'apollo-link-http';
-import {InMemoryCache} from 'apollo-cache-inmemory';
-import {gql} from "apollo-boost";
-import {WebSocketLink} from "apollo-link-ws";
-
+import * as rm from 'typed-rest-client'
+import {HttpClient} from "typed-rest-client/HttpClient";
+import {AppError, Subscriber, Subscription} from "./models";
+import {ApiRequest} from "./models";
+import {Response} from "./base/response";
+import {ApiResponse} from "./models";
 
 export interface GraphParameters<V> {
     query: string
@@ -15,140 +11,154 @@ export interface GraphParameters<V> {
 }
 
 export interface ApiClient {
+    post(url: string, parameters: any | null, headers?: Map<string, any> | null): ApiRequest
+
+    get(url: string, headers?: Map<string, any> | null): ApiRequest
+
+    delete(url: string, parameters?: any | null, headers?: Map<string, any> | null): ApiRequest
+
     query<V>(request: GraphParameters<V>, headers?: Map<string, any> | null): ApiRequest
 
     subscription<V>(request: GraphParameters<V>, headers?: Map<string, any> | null): ApiRequest
 }
 
-const host = "http://localhost:9000";
+const host = "http://localhost:9000/";
+const clientId = "";
 
-class ApolloGraphClient implements ApiClient {
+class RestApiClient implements ApiClient {
 
-    httpLink = new HttpLink({
-        uri: `${host}/graphql`,
-        headers: {
-            "x-token": localStorage.getItem("token")
-        },
-    });
+    rest: rm.RestClient = new rm.RestClient("webapp", host);
 
+    get(url: string, headers?: Map<string, any> | null): ApiRequest {
+        return this.request(url, 'get', headers)
+    }
 
-    wsLink = new WebSocketLink({
-        uri: `ws://localhost:9000/graphql`,
-        options: {
-            reconnect: true
-        }
-    });
+    post(url: string, parameters: any | null, headers?: Map<string, any> | null): ApiRequest {
+        return this.request(url, 'post', headers, parameters)
+    }
 
-    // using the ability to split links, you can send data to each link
-// depending on what kind of operation is being sent
-    link = split(
-        // split based on operation type
-        ({query}) => {
-            const definition = getMainDefinition(query);
-            return (
-                definition.kind === 'OperationDefinition' &&
-                definition.operation === 'subscription'
-            );
-        },
-        this.wsLink,
-        this.httpLink,
-    );
-
-    client = new ApolloClient({
-        link: this.link,
-        cache: new InMemoryCache(),
-        typeDefs: ""
-    });
+    delete(url: string, parameters: any | null, headers?: Map<string, any> | null): ApiRequest {
+        return this.request(url, 'delete', headers, parameters)
+    }
 
     query<V>(request: GraphParameters<V>, headers?: Map<string, any> | null): ApiRequest {
-        return new ApiGraphRequestHandler(this.client, request)
+        return this.post("graphql",request,headers)
     }
 
     subscription<V>(request: GraphParameters<V>, headers?: Map<string, any> | null): ApiRequest {
-        return new ApiGraphRequestHandler(this.client, request)
+        return this.post("graphql",request,headers)//todo: might need to change with websocket impl
+    }
+
+    private request(url: string, method: string, headers?: Map<string, string> | null, parameters?: Map<string, string> | null): ApiRequest {
+        return new ApiRequestHandler(this.rest,url,method,headers,parameters)
     }
 }
 
-//C is cache, V is variable type
-class ApiGraphRequestHandler<C, V> implements ApiRequest {
-    client: ApolloClient<C>;
-    parameters: GraphParameters<V>;
 
-    constructor(client: ApolloClient<C>, request: GraphParameters<V>,) {
-        this.client = client;
-        this.parameters = request
+class ApiRequestHandler implements ApiRequest {
+    private readonly httpClient: HttpClient;
+    rest: rm.RestClient;
+    method: string;
+    headers?: any;
+    parameters?: any;
+    url: string;
+    constructor(rest: rm.RestClient, url: string, method: string, headers?: any, parameters?: any) {
+        this.url = url;
+        this.method = method;
+        this.rest = rest;
+        this.httpClient = rest.client;
+        this.headers = headers;
+        this.parameters = parameters;
+
+        if (headers === undefined || headers === null) {
+            this.headers = {
+                "client-id":clientId
+            }
+        }
     }
 
     cancel(): void {
+        this.httpClient.dispose()
+    }
+
+
+    requestOptions(): rm.IRequestOptions {
+        return {additionalHeaders: this.headers}
     }
 
     async responseHandler<T>(): Promise<T> {
-        let gqlNode = gql(this.parameters.query);
-        if (this.parameters.query.includes("mutation")) {
-            console.log("mutation " + this.parameters.query);
-            try {
-                let result = await this.client.mutate({
-                    mutation: gqlNode,
-                    variables: this.parameters.variables,
-                });
-                return this.validateResponse<T>(this.filterResult(result))
-            } catch (graphqlErrors) {
-                throw graphqlErrors.graphQLErrors[0]
-            }
-
-        } else {
-            console.log("query " + this.parameters.query);
-            let result = await this.client.query<T>({query: gqlNode, variables: this.parameters.variables});
-            return this.validateResponse<T>(result.data)
+        let options = this.requestOptions();
+        console.log("Url => " + JSON.stringify(this.url));
+        console.log("Method => " + JSON.stringify(this.method));
+        console.log("Header => " + JSON.stringify(options));
+        if (this.method === "post") {
+            console.log("Body => " + JSON.stringify(this.parameters));
+            let response = await this.rest.create<T>(this.url, this.parameters, options);
+            return this.validateResponse(response)
+        } else if (this.method === "delete") {
+            let response = await this.rest.del<T>(this.url, options);
+            return this.validateResponse(response)
+        } else {//if(this.method === "get")
+            let response = await this.rest.get<T>(this.url,options);
+            return this.validateResponse(response)
         }
-
     }
 
-    private filterResult = <T>(result: any): T | null => {
-        if (result) {
-            console.log("Response Result => " + JSON.stringify(result));
-            if (result.data) {
-                let firstKey = Object.keys(result.data)[0];
-                result = result.data[firstKey];
-                result = {data: result};
-                console.log("Response Result Data =>" + JSON.stringify(result));
-                return result.data
-            }
-        }
-        return null
-    };
-
-    private validateResponse<T>(response: T | undefined | null): Promise<T> {
+    private validateResponse<T>(response: rm.IRestResponse<T>): Promise<T> {
         return new Promise<T>((resolver, reject) => {
-            if (response) {
-                resolver(response)
-            } else {
+            console.log("Response => " + JSON.stringify(response));
+            //todo: handle statusCode : 200 or other
+            if (response.result === null) {
                 let error: AppError = {name: "", message: "Null response returned"};
                 reject(error)
+            } else {
+                resolver(response.result)
             }
         })
     }
 
-    response<T>(): Promise<T> {
-        return this.responseHandler<T>()
+    async apiResponseHandler<T>(): Promise<ApiResponse<T>> {
+        let response = await this.responseHandler<ApiResponse<T>>();
+        return this.validateApiResponse(response)
+    }
+
+    private validateApiResponse<T>(response: ApiResponse<T>): Promise<ApiResponse<T>> {
+        return new Promise<ApiResponse<T>>((resolver, reject) => {
+            if (response.errors === undefined || response.errors === null) {
+                resolver(response)
+            } else {
+                reject(response.errors)
+            }
+        })
+    }
+
+    async response<T>(): Promise<Response<T>> {
+        return this.apiResponseHandler<T>()
+    }
+
+    responseExact<T>(): Promise<T> {
+        return this.responseHandler()
     }
 
     subscribe<T>(subscriber: Subscriber<T>): Subscription {
-        let gqlNode = gql(this.parameters.query);
-        let subscription = this.client.subscribe({query: gqlNode, variables: this.parameters.variables}).subscribe(result => {
-            let response = this.filterResult<T>(result);
-            if (response) {
-                subscriber.update(response)
-            }
-        });
+        // this.ws.c
+        // let gqlNode = gql(this.parameters.query);
+        // let subscription = this.client.subscribe({query: gqlNode, variables: this.parameters.variables}).subscribe(result => {
+        //     let response = this.filterResult<T>(result);
+        //     if (response) {
+        //         subscriber.update(response)
+        //     }
+        // });
+        //todo: handle subscription through web socket client
         return  {
             unsubscribe(): void {
-                subscription.unsubscribe()
+                // subscription.unsubscribe()
             }
         }
     }
 }
 
-const apiClient: ApiClient = new ApolloGraphClient();
+
+const apiClient: ApiClient = new RestApiClient();
 
 export default apiClient

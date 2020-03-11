@@ -30,7 +30,7 @@ class UserManagerImpl implements UserManager {
     login(loginRequest: LoginRequest): Promise<User> {
         return new Promise<User>((resolve, rejects) => {
             apiManager.user().login(loginRequest).response<AuthResponse>().then(res => {
-                this.resolveUser(res, resolve)
+                this.resolveUser(res.data, resolve)
             }).catch(rejects)
         })
     }
@@ -38,7 +38,7 @@ class UserManagerImpl implements UserManager {
     register(registerRequest: RegisterRequest): Promise<User> {
         return new Promise<User>((resolve, rejects) => {
             apiManager.user().register(registerRequest).response<AuthResponse>().then(response => {
-                this.resolveUser(response, resolve)
+                this.resolveUser(response.data, resolve)
             }).catch(rejects)
         })
     }
@@ -79,7 +79,7 @@ class UserManagerImpl implements UserManager {
     allMessages(): Promise<Array<Message>> {
        return new Promise<Array<Message>>((resolve, rejects) => {
            apiManager.user().messagesBy(dataManager.readSession().userId).response<Array<Message>>().then(messages => {
-               resolve(messages)
+               resolve(messages.data)
            }).catch(rejects)
        })
     }
