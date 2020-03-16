@@ -92,8 +92,9 @@ class ApiGraphRequestHandler<C, V> implements ApiRequest {
                     variables: this.parameters.variables,
                 });
                 return this.validateResponse<T>(this.filterResult(result))
-            } catch (graphqlErrors) {
-                throw graphqlErrors.graphQLErrors[0]
+            } catch (errors) {
+                let error: AppError = {name: "Api Data Error", message: errors.message};
+                throw error
             }
 
         } else {
