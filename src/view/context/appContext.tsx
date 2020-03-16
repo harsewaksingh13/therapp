@@ -9,7 +9,11 @@ import {UserProvider} from "./user/userContext";
 import dataManager from "../../data/dataManager";
 import {initialSession, Session} from "../../data/models/session";
 
-export const app: App = dataManager.readObject<App>("app",{session: initialSession, user: {firstName: "", email: "test@gmail.com", lastName: ""}, appState: AppState.idle});
+export const app: App = dataManager.readObject<App>("app",{
+    session: initialSession,
+    user: {firstName: "", email: "test@gmail.com", lastName: ""},
+    appState: AppState.idle,
+    appTheme: {primaryColor:"",backgroundColor:""}});
 
 type AppHandler = {
     app: App
