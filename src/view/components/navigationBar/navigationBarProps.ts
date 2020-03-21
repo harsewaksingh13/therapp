@@ -1,5 +1,5 @@
 import {BaseProps} from "../baseProps";
 
-export interface NavigationBarProps extends BaseProps{
+export interface NavigationBarProps extends BaseProps {
 
 }

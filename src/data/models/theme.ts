@@ -1,5 +1,6 @@
 export interface Theme {
     primaryColor : string,
+    secondaryColor: string,
     backgroundColor : string
 }
 

@@ -9,11 +9,16 @@ import {UserProvider} from "./user/userContext";
 import dataManager from "../../data/dataManager";
 import {initialSession, Session} from "../../data/models/session";
 
-export const app: App = dataManager.readObject<App>("app",{
+export const app: App = dataManager.readObject<App>("app", {
     session: initialSession,
     user: {firstName: "", email: "test@gmail.com", lastName: ""},
     appState: AppState.idle,
-    appTheme: {primaryColor:"",backgroundColor:""}});
+    appTheme: {
+        primaryColor: "",
+        secondaryColor:"",
+        backgroundColor: ""
+    }
+});
 
 type AppHandler = {
     app: App
@@ -37,7 +42,7 @@ export const AppProvider = ({children}: AppProviderProps) => {
     const appActions: AppActions = {
 
         loading(): void {
-            loading(dispatch,app)
+            loading(dispatch, app)
         },
 
         done(): void {
@@ -50,12 +55,12 @@ export const AppProvider = ({children}: AppProviderProps) => {
 
         user(user: User): void {
             app.user = user;
-            dispatch({appAction:AppAction.user,appUpdate:app})
+            dispatch({appAction: AppAction.user, appUpdate: app})
         },
 
         session(session: Session): void {
             app.session = session;
-            dispatch({appAction:AppAction.user,appUpdate:app})
+            dispatch({appAction: AppAction.user, appUpdate: app})
         }
     };
     return (
