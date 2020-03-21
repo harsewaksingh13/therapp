@@ -4,6 +4,14 @@ export interface Theme {
     backgroundColor : string
 }
 
+export interface ComponentStyle {
+    backgroundColor? : string
+    width? : string
+    height? :string
+    margin? : string
+    padding? : string
+}
+
 export interface AppTheme extends Theme {
 
 }
