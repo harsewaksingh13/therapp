@@ -8,15 +8,16 @@ import {User} from "../../data/models/user";
 import {UserProvider} from "./user/userContext";
 import dataManager from "../../data/dataManager";
 import {initialSession, Session} from "../../data/models/session";
+import {ThemeProvider} from "styled-components";
 
 export const app: App = dataManager.readObject<App>("app", {
     session: initialSession,
     user: {firstName: "", email: "test@gmail.com", lastName: ""},
     appState: AppState.idle,
     appTheme: {
-        primaryColor: "",
-        secondaryColor:"",
-        backgroundColor: ""
+        primaryColor: "green",
+        secondaryColor:"black",
+        backgroundColor: "white"
     }
 });
 
@@ -65,9 +66,12 @@ export const AppProvider = ({children}: AppProviderProps) => {
     };
     return (
         <AppContext.Provider value={{app, appActions}}>
-            <UserProvider>
-                {children}
-            </UserProvider>
+            {/*styled components*/}
+            <ThemeProvider theme={app.appTheme}>
+                <UserProvider>
+                 {children}
+                </UserProvider>
+            </ThemeProvider>
         </AppContext.Provider>
     )
 };

@@ -1,15 +1,27 @@
 import * as React from "react";
 import {InputFieldProps} from "./inputFieldProps";
-import Label from "../label/label";
 import {useState} from "react";
+import styled from "../styled"
+import {Label, Section} from "..";
 
+const Input = styled.input<InputFieldProps>`
+  height: ${prop => prop.style?.width || "30px"};
+  width: ${prop => prop.style?.width || "220px"};
+  padding: 0.5em;
+  margin: 0.5em;
+  font-size: ${props => props.style?.fontSize || "1em"};
+  color: ${prop => prop.style?.color || prop.theme.primaryTextColor || "#333333"}
+  background: ${prop => prop.style?.backgroundColor || prop.theme.backgroundColor};
+  border: 0.5px solid;
+  border-radius: 3px;
+`;
 
-const InputField: React.FC<InputFieldProps> = (props) => {
+export const InputField: React.FC<InputFieldProps> = (props) => {
     const [focus, setFocus] = useState(false);
     return (
-        <div>
+        <Section >
             <Label text={props.placeholder}/>
-            <input {...props}
+            <Input {...props}
                    onBlur={() =>
                        setFocus(false)
                    }
@@ -17,8 +29,7 @@ const InputField: React.FC<InputFieldProps> = (props) => {
                        setFocus(true)
                    }
             />
-        </div>
+        </Section>
     )
 };
 
-export default InputField

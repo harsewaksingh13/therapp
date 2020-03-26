@@ -1,7 +1,8 @@
-import React, { useState} from 'react';
+import React, {useState} from 'react';
 import navigator from "../navigation/appNavigator";
 import {LoginRequest} from "../../api/models";
 import {useUser, useUserActions} from "../context/user/userContext";
+import {Button, InputField, NavigationPage, Section} from "../components";
 
 
 function handleRegisterFromLogin() {
@@ -15,28 +16,29 @@ const Login: React.FC = () => {
     const [request,setLoginRequest] = useState<LoginRequest>({email:user.email ,password:"123456"});
 
     return (
-    <div>
-        <input
-            name="email"
+    <NavigationPage>
+        <h1>Login</h1>
+        <InputField
+            placeholder="Email"
             value={request.email}
             onChange={e => setLoginRequest({email:e.target.value, password:request.password})}
         />
-        <input
-            name="password"
+        <InputField
+            placeholder="Password"
+            type="text"
             value={request.password}
             onChange={e => setLoginRequest({email:request.email, password:e.target.value})}
         />
-      <h1>Login</h1>
-      Login Page
-      <br></br>
-      <br></br>
-      <button onClick = { () => {
-          userActions?.login(request)
-      }}>Login</button>
-      <br></br>
-      <br></br>
-      <button onClick = {handleRegisterFromLogin}>Register</button>
-    </div>
+        <Section>
+            <Button style={{margin:"10px"}}
+                onClick = { () => {
+                    userActions?.login(request)
+                }}>Login</Button>
+
+            <Button style={{backgroundColor:"black", margin:"10px"}} onClick = {handleRegisterFromLogin}>Register</Button>
+        </Section>
+
+    </NavigationPage>
   );
 };
 

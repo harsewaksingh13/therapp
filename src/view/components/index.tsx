@@ -1,4 +1,8 @@
-export * from './button/button'
-export * from './navigationBar/navigationBar'
-export * from './navigationPage/navigationPage'
-export * from './page/page'
+import {Button} from "./button/button";
+import {Label} from "./label/label"
+import {InputField} from "./inputField/inputField";
+import {Section} from "./section/section";
+import {NavigationPage} from "./navigationPage/navigationPage";
+import {NavigationBar} from "./navigationBar/navigationBar";
+
+export { Button, Label, InputField, Section, NavigationBar, NavigationPage};

@@ -1,9 +1,10 @@
 import {LabelProps} from "../label/labelProps";
+import {ChangeEventHandler} from "react";
 
 export interface InputFieldProps extends LabelProps {
     placeholder?: string
     type?: string
     required?: boolean
-    name? : string
-    value: string
+    value?: string
+    onChange? : ChangeEventHandler<HTMLInputElement>
 }

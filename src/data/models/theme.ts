@@ -13,5 +13,5 @@ export interface ComponentStyle {
 }
 
 export interface AppTheme extends Theme {
-
+    primaryTextColor? : string
 }

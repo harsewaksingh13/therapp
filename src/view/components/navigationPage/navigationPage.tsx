@@ -1,18 +1,17 @@
 import * as React from "react";
 import Page from "../page/page";
-import NavigationBar from "../navigationBar/navigationBar";
 import {NavigationPageProps} from './navigationPageProps'
+import {NavigationBar} from "..";
 
 
 
 
-const NavigationPage: React.FC<NavigationPageProps> = (props) => {
+export const NavigationPage: React.FC<NavigationPageProps> = (props) => {
     return (
         <div>
             <NavigationBar/>
-            <Page>{props.children} </Page>
+            <Page {...props}> {props.children} </Page>
         </div>
     )
 };
 
-export default NavigationPage
