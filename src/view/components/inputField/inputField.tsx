@@ -17,7 +17,7 @@ const Input = styled.input<InputFieldProps>`
 `;
 
 export const InputField: React.FC<InputFieldProps> = (props) => {
-    const [focus, setFocus] = useState(false);
+    const [,setFocus] = useState(false);
     return (
         <Section >
             <Label text={props.placeholder}/>

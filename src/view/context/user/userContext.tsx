@@ -21,14 +21,12 @@ export const UserProvider = ({children}: UserProviderProps) => {
     const {app,appActions} = useApp();
     const userActions: UserActions = {
         login(loginRequest: LoginRequest): void {
+            appActions?.processing();
             userManager.login(loginRequest).then(res => {
-                appActions?.processing();
-                navigator.user().home();
-                //todo: parse from res object
-                let user: User = {firstName: "Harsewak", lastName: "Singh", email: "test@gmail.com"}
-                appActions?.user(user);
+                appActions?.done();
+                appActions?.user(res);
                 appActions?.session(dataManager.readSession());
-                appActions?.done()
+                navigator.user().home();
             }).catch(error => {
                 console.log("Error "+JSON.stringify(error));
                 alert(error.message);
@@ -40,6 +38,7 @@ export const UserProvider = ({children}: UserProviderProps) => {
                 let user: User = {firstName: "", lastName: "", email: app.user.email};
                 appActions?.user(user);
                 appActions?.session(initialSession)
+                appActions?.idle()
             }).catch(error => {
                 //todo: handle error dispatch
             })

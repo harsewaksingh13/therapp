@@ -3,7 +3,7 @@ import {useContext} from "react";
 import {App, AppState} from "../../data/models/app";
 import {appReducer} from "./appReducer";
 import {AppAction, AppUpdateAction} from "./appAction";
-import {AppActions, loading} from "./appActions";
+import {AppActions, done, idle, loading, processing} from "./appActions";
 import {User} from "../../data/models/user";
 import {UserProvider} from "./user/userContext";
 import dataManager from "../../data/dataManager";
@@ -47,11 +47,15 @@ export const AppProvider = ({children}: AppProviderProps) => {
         },
 
         done(): void {
+            done(dispatch,app);
+        },
 
+        idle() : void {
+          idle(dispatch,app);
         },
 
         processing(): void {
-
+            processing(dispatch,app)
         },
 
         user(user: User): void {
@@ -79,3 +83,7 @@ export const AppProvider = ({children}: AppProviderProps) => {
 export const useApp = () => {
     return useContext(AppContext);
 };
+
+export const useAppState = () => {
+    return useApp().app.appState
+}

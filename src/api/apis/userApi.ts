@@ -35,6 +35,8 @@ export class UserApiManager implements UserApi {
                 "        _id\n" +
                 "        alias\n" +
                 "        email\n" +
+                "        fname" +
+                "        lname"+
                 "    }\n" +
                 "  }\n" +
                 "}", variables: {input: {"email": request.email, "password": request.password}}
@@ -49,36 +51,18 @@ export class UserApiManager implements UserApi {
         return this.apiClient.query({query: ""})
     }
 
-    messageQuery = "  _id\n" +
-        "    text\n" +
-        "    createdAt\n" +
-        "    creator{\n" +
-        "        _id\n" +
-        "        email\n" +
-        "    }\n" +
-        "    receiver {\n" +
-        "        _id\n" +
-        "        email\n" +
-        "    }";
+    messageQuery = "  _id text createdAt creator{ _id email } receiver { _id email }";
 
     messages(): ApiRequest {
         return this.apiClient.subscription({
-            query: "subscription {\n" +
-                "  createMessage {\n" +
-                this.messageQuery +
-                "  }\n" +
-                "}\n"
+            query: "subscription { createMessage { " + this.messageQuery + " } }"
             , variables: {}
         })
     }
 
     messagesBy(userId: string): ApiRequest {
         return this.apiClient.query({
-            query: "{\n" +
-                "  messages(relatedId:" + userId + "){\n" +
-                this.messageQuery +
-                "  }\n" +
-                "}"
+            query: "{ messages(relatedId:" + userId + "){ " + this.messageQuery + " } }"
         })
     }
 }
