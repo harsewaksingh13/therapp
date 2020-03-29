@@ -19,8 +19,8 @@ const Input = styled.input<InputFieldProps>`
 export const InputField: React.FC<InputFieldProps> = (props) => {
     const [,setFocus] = useState(false);
     return (
-        <Section >
-            <Label text={props.placeholder}/>
+        <Section>
+            <Label text={props.placeholder} />
             <Input {...props}
                    onBlur={() =>
                        setFocus(false)

@@ -9,10 +9,11 @@ const StyledSection = styled.section<SectionProps>`
   padding: ${props => props.style?.padding};
   margin: ${props => props.style?.margin};
   display: flex;
+  flex-wrap: wrap;
   flex-direction: ${props => props.direction || SectionDirection.COLUMN};
   align-items: ${props => props.alignItems || SectionAlignment.START};
   align-content: ${props => props.alignContent || SectionAlignment.START};
-  background: ${props => props.style?.backgroundColor || props.theme.backgroundColor}
+  background: ${props => props.style?.backgroundColor || props.theme.transparent}
 `;
 
 

@@ -10,13 +10,13 @@ import dataManager from "../../data/dataManager";
 import {initialSession, Session} from "../../data/models/session";
 import {ThemeProvider} from "styled-components";
 
-export const app: App = dataManager.readObject<App>("app", {
+export const app: App = dataManager.readObject<App>("App", {
     session: initialSession,
     user: {firstName: "", email: "test@gmail.com", lastName: ""},
     appState: AppState.idle,
     appTheme: {
-        primaryColor: "green",
-        secondaryColor:"black",
+        primaryColor: "red",
+        secondaryColor:"green",
         backgroundColor: "white"
     }
 });
@@ -86,4 +86,8 @@ export const useApp = () => {
 
 export const useAppState = () => {
     return useApp().app.appState
-}
+};
+
+export const useAppTheme = () => {
+    return useApp().app.appTheme
+};
