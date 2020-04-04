@@ -4,10 +4,10 @@ import styled from "../styled"
 
 const StyledNavigationBar = styled.section<NavigationBarProps>`
   padding: 0.025em 8em 0em 8em;
-  background: ${props => props.theme.primaryColor};
+  background: ${props => props.theme.palette.primaryColor};
   height : 50px;
   border: 2px solid;
-  color: ${props => props.theme.primaryColor};
+  color: ${props => props.theme.palette.primaryColor};
 `;
 
 export const NavigationBar : React.FC<NavigationBarProps> = (props) => {

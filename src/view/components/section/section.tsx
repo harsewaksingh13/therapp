@@ -13,7 +13,7 @@ const StyledSection = styled.section<SectionProps>`
   flex-direction: ${props => props.direction || SectionDirection.COLUMN};
   align-items: ${props => props.alignItems || SectionAlignment.START};
   align-content: ${props => props.alignContent || SectionAlignment.START};
-  background: ${props => props.style?.backgroundColor || props.theme.transparent}
+  background: ${props => props.style?.backgroundColor || props.theme.palette.transparent}
 `;
 
 

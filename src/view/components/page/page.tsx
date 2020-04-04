@@ -13,21 +13,21 @@ const StyledPage = styled.section`
   display: flex;
   flex-wrap: wrap;
   flex-direction: column;
-  background: ${props => props.theme.backgroundColor};
+  background: ${props => props.theme.palette.backgroundColor};
 `;
 
 const Page: React.FC<PageProps> = (props) => {
     let appState = useAppState();
     let appTheme = useAppTheme();
     let appStateString = "Idle";
-    let color = appTheme.primaryColor;
+    let color = appTheme.palette.primaryColor;
     if (appState === AppState.idle) {
         appStateString = "";
         color = "transparent"
     }
     if (appState === AppState.processing) {
         appStateString = "Processing";
-        color = appTheme.primaryColor;
+        color = appTheme.palette.primaryColor;
     }
     if (appState === AppState.loading) {
         appStateString = "Loading"

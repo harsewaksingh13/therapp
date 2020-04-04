@@ -1,4 +1,4 @@
-import {LabelProps} from "../label/labelProps";
+import {LabelProps, LabelStyle} from "../label/labelProps";
 import {MouseEventHandler} from "react";
 
 export interface ButtonProps extends LabelProps {

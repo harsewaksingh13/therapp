@@ -1,7 +1,7 @@
 import {BaseProps} from "../baseProps";
-import {ComponentStyle} from "../../../data/models/theme";
+import {ComponentStyle} from "../componentStyle";
 
-interface LabelStyle extends ComponentStyle {
+export interface LabelStyle extends ComponentStyle {
     textColor?: string
 }
 

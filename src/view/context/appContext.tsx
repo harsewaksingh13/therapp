@@ -15,9 +15,18 @@ export const app: App = dataManager.readObject<App>("App", {
     user: {firstName: "", email: "test@gmail.com", lastName: ""},
     appState: AppState.idle,
     appTheme: {
-        primaryColor: "red",
-        secondaryColor:"green",
-        backgroundColor: "white"
+        palette: {
+            primaryColor: "red",
+            primaryButtonBackgroundColor: "red",
+            primaryButtonTextColor: "white",
+
+            backgroundColor: "white",
+
+            secondaryColor: "green",
+            secondaryButtonBackgroundColor: "transparent",
+            secondaryButtonTextColor: "black",
+            transparent: "#00000000"
+        }
     }
 });
 
@@ -47,15 +56,15 @@ export const AppProvider = ({children}: AppProviderProps) => {
         },
 
         done(): void {
-            done(dispatch,app);
+            done(dispatch, app);
         },
 
-        idle() : void {
-          idle(dispatch,app);
+        idle(): void {
+            idle(dispatch, app);
         },
 
         processing(): void {
-            processing(dispatch,app)
+            processing(dispatch, app)
         },
 
         user(user: User): void {
@@ -73,7 +82,7 @@ export const AppProvider = ({children}: AppProviderProps) => {
             {/*styled components*/}
             <ThemeProvider theme={app.appTheme}>
                 <UserProvider>
-                 {children}
+                    {children}
                 </UserProvider>
             </ThemeProvider>
         </AppContext.Provider>

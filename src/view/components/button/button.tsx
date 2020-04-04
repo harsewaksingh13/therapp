@@ -9,11 +9,11 @@ const ButtonStyled = styled.button<ButtonProps>`
   height: ${props => props.style?.height || "44px"};
   padding: ${props => props.style?.padding};
   margin: ${props => props.style?.margin || "10px"};
-  color: ${props => props.style?.textColor || "white"};
+  color: ${props => props.style?.textColor || props.theme.palette.primaryButtonTextColor || "white"};
   font-size: ${props => props.style?.fontSize || "1em"};
-  border: 2px solid ${props => props.style?.backgroundColor || props.theme.primaryColor};
+  border: 2px solid ${props => props.style?.borderColor || props.theme.palette.primaryButtonBackgroundColor || props.theme.palette.primaryColor};
   border-radius: 4px;
-  background: ${props => props.style?.backgroundColor || props.theme.primaryColor};
+  background: ${props => props.style?.backgroundColor || props.theme.palette.primaryButtonBackgroundColor || props.theme.palette.primaryColor};
 `;
 
 export const Button: React.FC<ButtonProps> = (props) => {
@@ -25,7 +25,7 @@ export const Button: React.FC<ButtonProps> = (props) => {
 export const ButtonSecondary: React.FC<ButtonProps> = (props) => {
     let appTheme = useAppTheme();
     return (
-        <Button style={{backgroundColor:appTheme.secondaryColor}} {...props}/>
+        <Button style={{backgroundColor:appTheme.palette.secondaryButtonBackgroundColor, borderColor: appTheme.palette.secondaryColor, textColor: appTheme.palette.secondaryButtonTextColor}} {...props}/>
     )
 };
 

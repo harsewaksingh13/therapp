@@ -1,5 +1,5 @@
 import {BaseProps} from "../baseProps";
-import {ComponentStyle} from "../../../data/models/theme";
+import {ComponentStyle} from "../componentStyle";
 
 export interface NavigationBarProps extends BaseProps<ComponentStyle> {
 
