@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {useContext} from "react";
-import {LoginRequest} from "../../../api/models";
+import {LoginRequest, RegisterRequest} from "../../../api/models";
 import {UserActions} from "./userActions";
 import { useApp } from "../appContext";
 import userManager from "../../../data/userManager";
@@ -16,7 +16,6 @@ type UserProviderProps = {
     children: React.ReactNode
 }
 
-
 export const UserProvider = ({children}: UserProviderProps) => {
     const {app,appActions} = useApp();
     const userActions: UserActions = {
@@ -28,6 +27,7 @@ export const UserProvider = ({children}: UserProviderProps) => {
                 appActions?.session(dataManager.readSession());
                 navigator.user().home();
             }).catch(error => {
+                appActions?.done();
                 console.log("Error "+JSON.stringify(error));
                 alert(error.message);
             })
@@ -41,6 +41,19 @@ export const UserProvider = ({children}: UserProviderProps) => {
                 appActions?.idle()
             }).catch(error => {
                 //todo: handle error dispatch
+            })
+        },
+        register(registerRequest: RegisterRequest): void {
+            appActions?.processing();
+            userManager.register(registerRequest).then(res => {
+                appActions?.done();
+                appActions?.user(res);
+                appActions?.session(dataManager.readSession());
+                navigator.user().home();
+            }).catch(error => {
+                appActions?.done();
+                console.log("Error "+JSON.stringify(error));
+                alert(error.message);
             })
         }
     };

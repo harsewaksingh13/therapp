@@ -1,52 +1,28 @@
-import styled from "../styled";
 import * as React from "react";
+import {makeStyles} from "@material-ui/core/styles";
+import {CircularProgress} from "@material-ui/core";
+
+
+const useStyles = makeStyles((theme) => ({
+    root: {
+        display: 'flex',
+        '& > * + *': {
+            marginLeft: theme.spacing(2),
+        },
+    },
+}));
 
 interface SpinnerProps {
     color?: string | ""
 }
 
-export const Spinner = (props : SpinnerProps) => (
+export const Spinner = (props : SpinnerProps) => {
+    const classes = useStyles();
+    return (
+        <div className={classes.root}>
+        <CircularProgress/>
+        </div>
+    );
+};
 
-    <StyledSpinner {...props} viewBox="0 0 50 50">
-        <circle
-            className="path"
-            cx="25"
-            cy="25"
-            r="20"
-            fill="none"
-            strokeWidth="4"
-        />
-    </StyledSpinner>
-);
 
-const StyledSpinner = styled.svg<SpinnerProps>`
-  display: flex;
-  animation: rotate 2s linear infinite;
-  width: 100px;
-  height: 50px;
-  & .path {
-    stroke: ${props => props.color || props.theme.palette.primaryColor};
-    stroke-linecap: round;
-    animation: dash 1.5s ease-in-out infinite;
-  }
-  
-  @keyframes rotate {
-    100% {
-      transform: rotate(360deg);
-    }
-  }
-  @keyframes dash {
-    0% {
-      stroke-dasharray: 1, 150;
-      stroke-dashoffset: 0;
-    }
-    50% {
-      stroke-dasharray: 90, 150;
-      stroke-dashoffset: -35;
-    }
-    100% {
-      stroke-dasharray: 90, 150;
-      stroke-dashoffset: -124;
-    }
-  }
-`;

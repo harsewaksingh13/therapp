@@ -32,6 +32,7 @@ export class UserNavigation extends BaseRouteNavigator implements UserNavigator 
 
 
     login(): void {
+        this.clearHistory();
         this.history.push("/login")
     }
 

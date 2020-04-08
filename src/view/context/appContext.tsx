@@ -8,7 +8,9 @@ import {User} from "../../data/models/user";
 import {UserProvider} from "./user/userContext";
 import dataManager from "../../data/dataManager";
 import {initialSession, Session} from "../../data/models/session";
-import {ThemeProvider} from "styled-components";
+import {ThemeProvider as StyledThemeProvider} from "styled-components";
+import {ThemeProvider as MaterialThemeProvider} from '@material-ui/styles';
+import {createMuiTheme} from "@material-ui/core";
 
 export const app: App = dataManager.readObject<App>("App", {
     session: initialSession,
@@ -16,15 +18,15 @@ export const app: App = dataManager.readObject<App>("App", {
     appState: AppState.idle,
     appTheme: {
         palette: {
-            primaryColor: "red",
-            primaryButtonBackgroundColor: "red",
+            primaryColor: "#ff0000",
+            primaryButtonBackgroundColor: "#ff0000",
             primaryButtonTextColor: "white",
 
             backgroundColor: "white",
 
             secondaryColor: "green",
-            secondaryButtonBackgroundColor: "transparent",
-            secondaryButtonTextColor: "black",
+            secondaryButtonBackgroundColor: "#00ff00",
+            secondaryButtonTextColor: "white",
             transparent: "#00000000"
         }
     }
@@ -48,7 +50,7 @@ export const useAppReducer = () => {
 
 export const AppProvider = ({children}: AppProviderProps) => {
     const [app, dispatch] = useAppReducer();
-
+    const appTheme = app.appTheme;
     const appActions: AppActions = {
 
         loading(): void {
@@ -77,14 +79,27 @@ export const AppProvider = ({children}: AppProviderProps) => {
             dispatch({appAction: AppAction.user, appUpdate: app})
         }
     };
+
+    const muiTheme = createMuiTheme({
+        palette: {
+            primary: {
+                main: appTheme.palette.primaryColor
+            }
+        }
+    });
+
+
     return (
         <AppContext.Provider value={{app, appActions}}>
-            {/*styled components*/}
-            <ThemeProvider theme={app.appTheme}>
-                <UserProvider>
-                    {children}
-                </UserProvider>
-            </ThemeProvider>
+            <MaterialThemeProvider theme={muiTheme}>
+                <StyledThemeProvider theme={appTheme}>
+
+                    <UserProvider>
+                        {children}
+                    </UserProvider>
+                </StyledThemeProvider>
+            </MaterialThemeProvider>
+
         </AppContext.Provider>
     )
 };

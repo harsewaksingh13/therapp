@@ -3,6 +3,7 @@ import navigator from "../navigation/appNavigator";
 import {LoginRequest} from "../../api/models";
 import {useUser, useUserActions} from "../context/user/userContext";
 import {Button, ButtonSecondary, InputField, NavigationPage} from "../components";
+import Page from "../components/page/page";
 
 function handleRegisterFromLogin() {
     navigator.user().register()
@@ -14,8 +15,8 @@ const Login: React.FC = () => {
     let user = useUser();
     const [request, setLoginRequest] = useState<LoginRequest>({email: user.email, password: "123456"});
     return (
-        <NavigationPage>
-            <h1>Login</h1>
+        <Page pageTitle={"Login"}>
+
             <InputField
                 placeholder="Email"
                 value={request.email}
@@ -23,7 +24,7 @@ const Login: React.FC = () => {
             />
             <InputField
                 placeholder="Password"
-                type="text"
+                type="Password"
                 value={request.password}
                 onChange={e => setLoginRequest({email: request.email, password: e.target.value})}
             />
@@ -32,9 +33,9 @@ const Login: React.FC = () => {
                     userActions?.login(request)
                 }}>Login</Button>
 
-            <ButtonSecondary onClick={handleRegisterFromLogin}>Register</ButtonSecondary>
+            <ButtonSecondary disabling={false} onClick={handleRegisterFromLogin}>Register</ButtonSecondary>
 
-        </NavigationPage>
+        </Page>
     );
 };
 

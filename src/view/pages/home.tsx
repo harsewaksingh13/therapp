@@ -1,6 +1,6 @@
 import React from "react";
 import {useUser, useUserActions} from "../context/user/userContext";
-import {NavigationPage} from "../components";
+import {ButtonSecondary, NavigationPage} from "../components";
 
 const Home: React.FC = () => {
     let user = useUser();
@@ -11,9 +11,9 @@ const Home: React.FC = () => {
             <h3>{user.email}</h3>
             Name
             <h2>{user.firstName}</h2>
-            <button onClick = {()=>{
+            <ButtonSecondary onClick = {()=>{
                 userActions?.logout()
-            }}>Logout</button>
+            }}>Logout</ButtonSecondary>
         </NavigationPage>
     );
 };

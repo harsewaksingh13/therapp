@@ -1,49 +1,35 @@
 import * as React from "react";
 import {PageProps} from "./pageProps";
-import styled from "../styled"
-import {Section, Spinner} from "..";
-import {useAppState, useAppTheme} from "../../context/appContext";
-import {SectionAlignment} from "../section/sectionProps";
-import {AppState} from "../../../data/models/app";
 
-const StyledPage = styled.section`
-  height: 100%;
-  width: 100%;
-  align-content:center;
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: column;
-  background: ${props => props.theme.palette.backgroundColor};
-`;
+import {useAppState} from "../../context/appContext";
+
+import {AppState} from "../../../data/models/app";
+import {LabelHeader} from "../label/label";
+import {makeStyles} from "@material-ui/core/styles";
+import {LinearProgress} from "@material-ui/core";
+import {Section} from "..";
+
+
+
+const useLinearStyles = makeStyles((theme) => ({
+    root: {
+        width: '100%',
+        '& > * + *': {
+            marginTop: 2,
+        },
+    },
+}));
 
 const Page: React.FC<PageProps> = (props) => {
     let appState = useAppState();
-    let appTheme = useAppTheme();
-    let appStateString = "Idle";
-    let color = appTheme.palette.primaryColor;
-    if (appState === AppState.idle) {
-        appStateString = "";
-        color = "transparent"
-    }
-    if (appState === AppState.processing) {
-        appStateString = "Processing";
-        color = appTheme.palette.primaryColor;
-    }
-    if (appState === AppState.loading) {
-        appStateString = "Loading"
-    }
-    if (appState === AppState.done) {
-        appStateString = "";
-        color = "transparent"
-    }
+    let loading = appState === AppState.processing || appState === AppState.loading;
+    const linearStyle = useLinearStyles();
     return (
-        <StyledPage {...props}>
+        <Section {...props}  >
+            { loading && <LinearProgress className={linearStyle.root} color="secondary"/>}
+            <LabelHeader text={props.pageTitle}/>
             {props.children}
-            <Section alignContent={SectionAlignment.CENTER}>
-                <Spinner color={color}/>
-                <h3>{appStateString}</h3>
-            </Section>
-        </StyledPage>
+        </Section>
     )
 };
 

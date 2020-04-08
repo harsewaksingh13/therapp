@@ -17,4 +17,7 @@ export class BaseRouteNavigator implements RouteNavigator {
         return [];
     }
 
+    clearHistory() : void {
+        //todo: handle clear history
+    }
 }
